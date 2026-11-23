@@ -82,18 +82,18 @@ h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(3
   <small>Tu colección</small>
   <div class="row" id="row"></div>
   <div class="next" id="next"></div>
-  <div class="next" style="color:#d4af5f">🎁 Llega a la <b>Corona (256)</b> y gana un <b>15% de descuento</b> en la tienda</div>
+  <div class="next" style="color:#d4af5f">🎁 Llega a la <b>Corona (512)</b> y gana un <b>15% de descuento</b> en la tienda OrdenDorado de Etsy</div>
 </div>
 <a class="shop" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">✦ Visita la tienda OrdenDorado</a>
 <p class="hint">Agendas, diarios, libros y plantillas premium</p>
 <div class="toast" id="toast"></div>
 <div id="gift" style="position:fixed;inset:0;background:rgba(8,6,4,.9);display:none;align-items:center;justify-content:center;z-index:45;padding:20px"><div class="box" style="width:100%;max-width:360px;background:linear-gradient(180deg,#221b11,#120f0b);border:1px solid #d4af5f;border-radius:22px;padding:26px 22px;text-align:center">
-  <div class="brand">¡Desbloqueaste la Corona!</div>
+  <div class="brand">¡Llegaste a la Corona!</div>
   <h2 style="font-family:Georgia,serif;font-weight:400;font-size:28px;margin:8px 0;color:#f3e3b5">Tu premio: 15% de descuento</h2>
-  <p style="font-size:14px;color:#a99a7c;line-height:1.5">Usa este código en la tienda OrdenDorado de Etsy al pagar:</p>
+  <p style="font-size:14px;color:#a99a7c;line-height:1.5">Usa este código al pagar en la tienda OrdenDorado de Etsy (agendas, diarios y plantillas digitales):</p>
   <div id="code" style="margin:14px auto 4px;padding:14px;border:2px dashed #d4af5f;border-radius:14px;font-size:28px;font-weight:800;letter-spacing:.12em;color:#f3e3b5">IMPERIO15</div>
   <button class="btn line" id="copy">Copiar código</button>
-  <a class="btn gold" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">Usarlo en la tienda</a>
+  <a class="btn gold" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">Usarlo en Etsy</a>
   <button class="btn line" id="keep">Seguir jugando</button>
 </div></div>
 <div id="modal"><div class="box">
@@ -110,7 +110,7 @@ h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(3
 const N=4;
 const LV=[null,
  ["2","Pepita"],["4","Moneda"],["8","Lingote"],["16","Anillo"],["32","Pulsera"],["64","Reloj"],
- ["128","Collar"],["256","Corona"],["512","Cetro"],["1024","Trono"],["2048","Imperio"],["4096","Leyenda"],["8192","Mito"]];
+ ["128","Collar"],["256","Cetro"],["512","Corona"],["1024","Trono"],["2048","Imperio"],["4096","Leyenda"],["8192","Mito"]];
 const STY=l=>{
   const t=[null,
    ["#3a2f22","#2c241a","#c9ab74"],["#4a3a24","#34291a","#e2c48a"],["#6b5028","#4a3519","#f4dca2"],
@@ -144,10 +144,20 @@ function spawn(){const e=empty();if(!e.length)return;const i=e[Math.floor(Math.r
 function snapshot(){return {s:score,t:tiles.map(t=>[t.r,t.c,t.lv])}}
 function restore(sn){tiles.forEach(t=>t.el.remove());tiles=[];sn.t.forEach(a=>mk(a[0],a[1],a[2]));score=sn.s;updScore()}
 
-function tone(l){if(!sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
-  const o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.value=330*Math.pow(2,(l-1)/6);
-  g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.12,ac.currentTime+.01);
-  g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.35);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.4)}catch(e){}}
+function actx(){if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C()}if(ac.state==="suspended")ac.resume();return ac}
+function unlockAudio(){const a=actx();if(!a)return;try{const b=a.createBuffer(1,1,22050),src=a.createBufferSource();src.buffer=b;src.connect(a.destination);src.start(0)}catch(e){}}
+["touchstart","mousedown","keydown"].forEach(ev=>window.addEventListener(ev,unlockAudio,{once:true,passive:true}));
+function note(f,t0,dur,vol,type){const a=actx();if(!a||!sound)return;const o=a.createOscillator(),g=a.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,a.currentTime+t0);
+  g.gain.setValueAtTime(.0001,a.currentTime+t0);g.gain.exponentialRampToValueAtTime(vol,a.currentTime+t0+.008);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t0+dur);
+  o.connect(g).connect(a.destination);o.start(a.currentTime+t0);o.stop(a.currentTime+t0+dur+.05)}
+function bell(f,t0,vol){note(f,t0,.6,vol,"sine");note(f*2,t0,.35,vol*.35,"sine");note(f*3,t0,.18,vol*.15,"triangle")}
+function coin(t0){note(1568,t0,.09,.08,"square");note(2093,t0+.06,.22,.07,"square")}
+function slide(){note(180,0,.06,.03,"triangle")}
+function tone(l,count){const base=262*Math.pow(2,(l-1)/7);bell(base,0,.16);
+  if(l>=4)coin(.03);
+  if(count>1){for(let i=1;i<Math.min(count,4);i++)bell(base*Math.pow(2,(i*4)/12),i*.07,.12)}}
+function fanfare(){[523,659,784,1047].forEach((f,i)=>bell(f,i*.11,.16));coin(.45);coin(.6)}
+function jackpot(){[523,659,784,1047,1319,1568].forEach((f,i)=>bell(f,i*.09,.17));for(let i=0;i<8;i++)coin(.55+i*.07)}
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 
 function move(dir){ // 0 up 1 right 2 down 3 left
@@ -168,11 +178,12 @@ function move(dir){ // 0 up 1 right 2 down 3 left
     tiles.filter(t=>t.dead).forEach(t=>t.el.remove());tiles=tiles.filter(t=>!t.dead);
     let top=0;
     merges.forEach(t=>{t.lv++;t.m=false;paint(t);void t.el.offsetWidth;t.el.classList.add("pop");top=Math.max(top,t.lv);fx(t)});
-    if(merges.length){tone(top);buzz(top>=7?25:8)}
+    if(merges.length){tone(top,merges.length);buzz(top>=7?25:8)}else slide();
     score+=gained;updScore();
     if(top>maxLv){maxLv=top}
-    if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);toast("✦ Desbloqueaste: "+LV[Math.min(top,13)][1]);drawColl()}
-    if(top>=8&&!gifted){gifted=true;setTimeout(()=>{$("gift").style.display="flex";buzz(60)},350)}
+    if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);toast("✦ Desbloqueaste: "+LV[Math.min(top,13)][1]);drawColl();if(top<9)fanfare()}
+    if(top>=9&&!gifted){jackpot();}
+    if(top>=9&&!gifted){gifted=true;setTimeout(()=>{$("gift").style.display="flex";buzz(60)},350)}
     if(top===11&&!won){won=true;end(true)}
     spawn();busy=false;updUndo();
     if(!canMove())setTimeout(()=>end(false),450);
@@ -209,7 +220,7 @@ window.addEventListener("keydown",e=>{const k={ArrowUp:0,ArrowRight:1,ArrowDown:
 $("undo").onclick=()=>{if(busy||!hist.length||!undos)return;restore(hist.pop());undos--;updUndo()};
 $("rst").onclick=()=>{if(confirmReset())start()};
 function confirmReset(){return score<200||window.confirm("¿Empezar una partida nueva?")}
-$("snd").onclick=()=>{sound=!sound;store.set("od_imp_snd",sound);$("snd").style.opacity=sound?1:.4;if(sound)tone(5)};
+$("snd").onclick=()=>{sound=!sound;store.set("od_imp_snd",sound);$("snd").style.opacity=sound?1:.4;if(sound){unlockAudio();tone(5,1)}};
 $("snd").style.opacity=sound?1:.4;
 $("again").onclick=()=>{if($("again").dataset.cont){$("modal").style.display="none"}else start()};
 $("share").onclick=async()=>{const txt=`Hice ${score} puntos en Imperio Dorado ✦ ¿Me superas?`;const url=location.href;
