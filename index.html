@@ -146,7 +146,8 @@ function restore(sn){tiles.forEach(t=>t.el.remove());tiles=[];sn.t.forEach(a=>mk
 
 function actx(){if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C()}if(ac.state==="suspended")ac.resume();return ac}
 function unlockAudio(){const a=actx();if(!a)return;try{const b=a.createBuffer(1,1,22050),src=a.createBufferSource();src.buffer=b;src.connect(a.destination);src.start(0)}catch(e){}}
-["touchstart","mousedown","keydown"].forEach(ev=>window.addEventListener(ev,unlockAudio,{once:true,passive:true}));
+function tryUnlock(){unlockAudio();if(ac&&ac.state==="running")["touchend","click","keydown","pointerup"].forEach(ev=>window.removeEventListener(ev,tryUnlock,true))}
+["touchend","click","keydown","pointerup"].forEach(ev=>window.addEventListener(ev,tryUnlock,true));
 function note(f,t0,dur,vol,type){const a=actx();if(!a||!sound)return;const o=a.createOscillator(),g=a.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,a.currentTime+t0);
   g.gain.setValueAtTime(.0001,a.currentTime+t0);g.gain.exponentialRampToValueAtTime(vol,a.currentTime+t0+.008);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t0+dur);
   o.connect(g).connect(a.destination);o.start(a.currentTime+t0);o.stop(a.currentTime+t0+dur+.05)}
@@ -216,7 +217,7 @@ function start(){tiles.forEach(t=>t.el.remove());tiles=[];score=0;maxLv=1;hist=[
 let sx=0,sy=0,st=0;
 board.addEventListener("touchstart",e=>{const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=1},{passive:true});
 board.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
-board.addEventListener("touchend",e=>{if(!st)return;st=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;
+board.addEventListener("touchend",e=>{unlockAudio();if(!st)return;st=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;
   if(Math.max(Math.abs(dx),Math.abs(dy))<22)return;Math.abs(dx)>Math.abs(dy)?move(dx>0?1:3):move(dy>0?2:0)});
 let mx=0,my=0,md=false;
 board.addEventListener("mousedown",e=>{md=true;mx=e.clientX;my=e.clientY});
