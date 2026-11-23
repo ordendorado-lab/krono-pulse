@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Krono Pulse 3D — Orden Dorado</title>
+  <style>
+    :root {
+      --bg: #070709;
+      --panel: rgba(18, 17, 20, 0.86);
+      --gold: #f5c451;
+      --gold-dim: rgba(245, 196, 81, 0.28);
+      --gold-glow: rgba(245, 196, 81, 0.55);
+      --text: #f7f5ef;
+      --muted: #a69f8e;
+      --danger: #ff4d5a;
+      --ok: #5be39d;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      user-select: none;
+    }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      background: radial-gradient(circle at 50% 35%, #171410 0%, var(--bg) 72%);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      touch-action: manipulation;
+    }
+
+    #game-wrap {
+      position: relative;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    canvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .hud-top {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 18px;
+      gap: 10px;
+      pointer-events: none;
+    }
+
+    .brand-tag {
+      font-size: 11px;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--gold);
+      font-weight: 700;
+    }
+
+    .stats {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      background: var(--panel);
+      border: 1px solid var(--gold-dim);
+      border-radius: 999px;
+      padding: 6px 12px;
+      font-size: 13px;
+      font-weight: 600;
+      backdrop-filter: blur(8px);
+    }
+
+    .pill span {
+      color: var(--gold);
+      font-variant-numeric: tabular-nums;
+    }
+
+    .center-overlay {
+      position: relative;
+      z-index: 3;
+      margin: auto;
+      width: min(90vw, 420px);
+      background: var(--panel);
+      border: 1px solid var(--gold-dim);
+      border-radius: 22px;
+      padding: 26px 22px;
+      text-align: center;
+      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 36px rgba(245, 196, 81, 0.08);
+      backdrop-filter: blur(12px);
+      transition: opacity 0.2s ease, transform 0.2s ease;
+    }
+
+    .center-overlay.hidden {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(0.96);
+    }
+
+    h1 {
+      margin: 6px 0 8px;
+      font-size: clamp(26px, 6vw, 34px);
+      letter-spacing: 0.04em;
+      color: var(--text);
+    }
+
+    h1 em {
+      font-style: normal;
+      color: var(--gold);
+    }
+
+    p.desc {
+      margin: 0 0 20px;
+      font-size: 14px;
+      line-height: 1.5;
+      color: var(--muted);
+    }
+
+    .btn-gold {
+      width: 100%;
+      border: 0;
+      border-radius: 14px;
+      padding: 15px 20px;
+      font-size: 16px;
+      font-weight: 800;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #120e05;
+      background: linear-gradient(135deg, #ffe08a 0%, var(--gold) 55%, #c8921c 100%);
+      box-shadow: 0 8px 28px var(--gold-glow);
+      cursor: pointer;
+    }
+
+    .btn-gold:active {
+      transform: scale(0.98);
+    }
+
+    .hud-bottom {
+      position: relative;
+      z-index: 2;
+      padding: 14px 18px 22px;
+      text-align: center;
+      font-size: 12px;
+      color: var(--muted);
+      pointer-events: none;
+    }
+
+    .feedback {
+      position: fixed;
+      left: 50%;
+      top: 22%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      font-size: 20px;
+      font-weight: 900;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.18s ease;
+      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
+    }
+
+    .feedback.show {
+      opacity: 1;
+    }
+  </style>
+</head>
+<body>
+  <div id="game-wrap">
+    <canvas id="c"></canvas>
+
+    <div class="hud-top">
+      <div class="brand-tag">Orden Dorado · Krono Pulse 3D</div>
+      <div class="stats">
+        <div class="pill">Puntos: <span id="score">0</span></div>
+        <div class="pill">Racha: <span id="combo">x1</span></div>
+        <div class="pill">Récord: <span id="best">0</span></div>
+      </div>
+    </div>
+
+    <div id="feedback" class="feedback"></div>
+
+    <div id="overlay" class="center-overlay">
+      <div class="brand-tag">Reflejos · Precisión · Ritmo</div>
+      <h1>Krono <em>Pulse</em> 3D</h1>
+      <p id="overlay-text" class="desc">
+        Toca la pantalla (o pulsa <strong>Espacio</strong>) justo cuando el anillo 3D cruce el núcleo dorado. Cada acierto acelera el pulso y sube tu multiplicador.
+      </p>
+      <button id="start-btn" class="btn-gold">Jugar ahora</button>
+    </div>
+
+    <div class="hud-bottom">Toca en cualquier parte o pulsa Espacio · Sin límite de pausa</div>
+  </div>
+
+  <script>
+    (() => {
+      const canvas = document.getElementById('c');
+      const ctx = canvas.getContext('2d');
+      const scoreEl = document.getElementById('score');
+      const comboEl = document.getElementById('combo');
+      const bestEl = document.getElementById('best');
+      const feedbackEl = document.getElementById('feedback');
+      const overlay = document.getElementById('overlay');
+      const overlayText = document.getElementById('overlay-text');
+      const startBtn = document.getElementById('start-btn');
+
+      const STORAGE_KEY = 'ordendorado_krono_pulse_best_v1';
+      let bestScore = Number(localStorage.getItem(STORAGE_KEY) || 0);
+      bestEl.textContent = bestScore;
+
+      let width = 0;
+      let height = 0;
+      let dpr = 1;
+
+      function resize() {
+        dpr = Math.min(window.devicePixelRatio || 1, 2);
+        width = window.innerWidth;
+        height = window.innerHeight;
+        canvas.width = Math.floor(width * dpr);
+        canvas.height = Math.floor(height * dpr);
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      }
+
+      window.addEventListener('resize', resize);
+      resize();
+
+      let state = 'menu'; // 'menu' | 'playing' | 'gameover'
+      let score = 0;
+      let streak = 0;
+      let ringRadius = 1;
+      let targetRadius = 72;
+      let shrinkSpeed = 165;
+      let pulseTime = 0;
+      let shake = 0;
+      let particles = [];
+      let feedbackTimer = null;
+
+      function showFeedback(text, color) {
+        feedbackEl.textContent = text;
+        feedbackEl.style.color = color;
+        feedbackEl.classList.add('show');
+        clearTimeout(feedbackTimer);
+        feedbackTimer = setTimeout(() => feedbackEl.classList.remove('show'), 380);
+      }
+
+      function spawnBurst(cx, cy, color, count) {
+        for (let i = 0; i < count; i++) {
+          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
+          const speed = 90 + Math.random() * 210;
+          particles.push({
+            x: cx,
+            y: cy,
+            vx: Math.cos(angle) * speed,
+            vy: Math.sin(angle) * speed,
+            life: 1,
+            decay: 1.6 + Math.random() * 1.1,
+            size: 2.5 + Math.random() * 3,
+            color
+          });
+        }
+      }
+
+      function resetRing() {
+        const minDim = Math.min(width, height);
+        targetRadius = Math.max(54, Math.min(86, minDim * 0.16));
+        ringRadius = Math.max(width, height) * 0.46;
+      }
+
+      function startGame() {
+        score = 0;
+        streak = 0;
+        shrinkSpeed = 175;
+        particles = [];
+        shake = 0;
+        state = 'playing';
+        scoreEl.textContent = '0';
+        comboEl.textContent = 'x1';
+        overlay.classList.add('hidden');
+        resetRing();
+        showFeedback('¡ENFOCA!', '#f5c451');
+      }
+
+      function gameOver(reason) {
+        state = 'gameover';
+        shake = 14;
+        if (score > bestScore) {
+          bestScore = score;
+          localStorage.setItem(STORAGE_KEY, String(bestScore));
+          bestEl.textContent = bestScore;
+        }
+        overlayText.innerHTML = `${reason}<br>Puntuación final: <strong>${score}</strong> · Récord: <strong>${bestScore}</strong>`;
+        startBtn.textContent = 'Reintentar';
+        overlay.classList.remove('hidden');
+      }
+
+      function handlePulseInput() {
+        if (state !== 'playing') return;
+
+        const cx = width * 0.5;
+        const cy = height * 0.52;
+        const diff = Math.abs(ringRadius - targetRadius);
+        const multiplier = 1 + Math.floor(streak / 4);
+
+        if (diff <= 14) {
+          streak += 1;
+          const nextMult = 1 + Math.floor(streak / 4);
+          score += 100 * nextMult;
+          shrinkSpeed = Math.min(540, shrinkSpeed + 11);
+          scoreEl.textContent = score;
+          comboEl.textContent = `x${nextMult}`;
+          spawnBurst(cx, cy, '#f5c451', 18);
+          showFeedback(diff <= 5 ? `PERFECTO +${100 * nextMult}` : `BIEN +${100 * nextMult}`, '#5be39d');
+          resetRing();
+        } else if (diff <= 34) {
+          streak += 1;
+          const nextMult = 1 + Math.floor(streak / 4);
+          score += 50 * nextMult;
+          shrinkSpeed = Math.min(540, shrinkSpeed + 6);
+          scoreEl.textContent = score;
+          comboEl.textContent = `x${nextMult}`;
+          spawnBurst(cx, cy, '#ffe08a', 10);
+          showFeedback(`AJUSTADO +${50 * nextMult}`, '#f5c451');
+          resetRing();
+        } else {
+          spawnBurst(cx, cy, '#ff4d5a', 20);
+          gameOver('Pulso fuera de sincronía.');
+        }
+      }
+
+      startBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        startGame();
+      });
+
+      window.addEventListener('pointerdown', (e) => {
+        if (e.target === startBtn) return;
+        if (state === 'playing') handlePulseInput();
+      });
+
+      window.addEventListener('keydown', (e) => {
+        if (e.code === 'Space') {
+          e.preventDefault();
+          if (state === 'playing') {
+            handlePulseInput();
+          } else {
+            startGame();
+          }
+        }
+      });
+
+      let lastTime = performance.now();
+
+      function draw3DScene(dt) {
+        pulseTime += dt;
+        const cx = width * 0.5;
+        const cy = height * 0.52;
+
+        ctx.save();
+        if (shake > 0) {
+          const sx = (Math.random() - 0.5) * shake;
+          const sy = (Math.random() - 0.5) * shake;
+          ctx.translate(sx, sy);
+          shake = Math.max(0, shake - dt * 42);
+        }
+
+        ctx.clearRect(0, 0, width, height);
+
+        // Perspectiva de rejilla 3D inferior
+        const horizonY = height * 0.54;
+        ctx.strokeStyle = 'rgba(245, 196, 81, 0.11)';
+        ctx.lineWidth = 1;
+        for (let i = -8; i <= 8; i++) {
+          ctx.beginPath();
+          ctx.moveTo(cx + i * 28, horizonY);
+          ctx.lineTo(cx + i * 135, height + 20);
+          ctx.stroke();
+        }
+        for (let row = 1; row <= 7; row++) {
+          const t = Math.pow(row / 7, 1.7);
+          const y = horizonY + t * (height - horizonY);
+          ctx.beginPath();
+          ctx.moveTo(0, y);
+          ctx.lineTo(width, y);
+          ctx.stroke();
+        }
+
+        // Anillo objetivo 3D (inclinación sutil y resplandor)
+        const tiltY = 0.86 + Math.sin(pulseTime * 2.2) * 0.04;
+        ctx.save();
+        ctx.translate(cx, cy);
+        ctx.scale(1, tiltY);
+
+        ctx.beginPath();
+        ctx.arc(0, 0, targetRadius, 0, Math.PI * 2);
+        ctx.strokeStyle = 'rgba(245, 196, 81, 0.35)';
+        ctx.lineWidth = 3;
+        ctx.stroke();
+
+        // Núcleo central 3D
+        const coreGrad = ctx.createRadialGradient(-10, -10, 4, 0, 0, targetRadius * 0.62);
+        coreGrad.addColorStop(0, '#fff0b8');
+        coreGrad.addColorStop(0.45, '#f5c451');
+        coreGrad.addColorStop(1, '#7c550b');
+        ctx.beginPath();
+        ctx.arc(0, 0, targetRadius * 0.55 + Math.sin(pulseTime * 6) * 2, 0, Math.PI * 2);
+        ctx.fillStyle = coreGrad;
+        ctx.shadowColor = 'rgba(245, 196, 81, 0.55)';
+        ctx.shadowBlur = 24;
+        ctx.fill();
+        ctx.shadowBlur = 0;
+
+        // Anillo entrante
+        if (state === 'playing') {
+          const dist = Math.abs(ringRadius - targetRadius);
+          const activeColor = dist <= 14 ? '#5be39d' : dist <= 34 ? '#f5c451' : '#f7f5ef';
+          ctx.beginPath();
+          ctx.arc(0, 0, Math.max(4, ringRadius), 0, Math.PI * 2);
+          ctx.strokeStyle = activeColor;
+          ctx.lineWidth = 4.5;
+          ctx.stroke();
+        }
+
+        ctx.restore();
+
+        // Partículas
+        for (let i = particles.length - 1; i >= 0; i--) {
+          const p = particles[i];
+          p.x += p.vx * dt;
+          p.y += p.vy * dt;
+          p.life -= p.decay * dt;
+          if (p.life <= 0) {
+            particles.splice(i, 1);
+            continue;
+          }
+          ctx.globalAlpha = Math.max(0, p.life);
+          ctx.fillStyle = p.color;
+          ctx.beginPath();
+          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        ctx.globalAlpha = 1;
+
+        ctx.restore();
+      }
+
+      function loop(now) {
+        const dt = Math.min(0.05, (now - lastTime) / 1000);
+        lastTime = now;
+
+        if (state === 'playing') {
+          ringRadius -= shrinkSpeed * dt;
+          if (ringRadius < targetRadius - 36) {
+            spawnBurst(width * 0.5, height * 0.52, '#ff4d5a', 18);
+            gameOver('Se cerró el pulso antes de tocar.');
+          }
+        }
+
+        draw3DScene(dt);
+        requestAnimationFrame(loop);
+      }
+
+      requestAnimationFrame(loop);
+    })();
+  </script>
+</body>
+</html>
