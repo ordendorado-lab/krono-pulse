@@ -1,484 +1,212 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
-  <title>Krono Pulse 3D — Orden Dorado</title>
-  <style>
-    :root {
-      --bg: #070709;
-      --panel: rgba(18, 17, 20, 0.86);
-      --gold: #f5c451;
-      --gold-dim: rgba(245, 196, 81, 0.28);
-      --gold-glow: rgba(245, 196, 81, 0.55);
-      --text: #f7f5ef;
-      --muted: #a69f8e;
-      --danger: #ff4d5a;
-      --ok: #5be39d;
-    }
-
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      user-select: none;
-    }
-
-    html, body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      background: radial-gradient(circle at 50% 35%, #171410 0%, var(--bg) 72%);
-      color: var(--text);
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
-      touch-action: manipulation;
-    }
-
-    #game-wrap {
-      position: relative;
-      width: 100%;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-      justify-content: space-between;
-    }
-
-    canvas {
-      position: fixed;
-      inset: 0;
-      width: 100%;
-      height: 100%;
-      display: block;
-    }
-
-    .hud-top {
-      position: relative;
-      z-index: 2;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 16px 18px;
-      gap: 10px;
-      pointer-events: none;
-    }
-
-    .brand-tag {
-      font-size: 11px;
-      letter-spacing: 0.18em;
-      text-transform: uppercase;
-      color: var(--gold);
-      font-weight: 700;
-    }
-
-    .stats {
-      display: flex;
-      gap: 10px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .pill {
-      background: var(--panel);
-      border: 1px solid var(--gold-dim);
-      border-radius: 999px;
-      padding: 6px 12px;
-      font-size: 13px;
-      font-weight: 600;
-      backdrop-filter: blur(8px);
-    }
-
-    .pill span {
-      color: var(--gold);
-      font-variant-numeric: tabular-nums;
-    }
-
-    .center-overlay {
-      position: relative;
-      z-index: 3;
-      margin: auto;
-      width: min(90vw, 420px);
-      background: var(--panel);
-      border: 1px solid var(--gold-dim);
-      border-radius: 22px;
-      padding: 26px 22px;
-      text-align: center;
-      box-shadow: 0 24px 60px rgba(0, 0, 0, 0.75), 0 0 36px rgba(245, 196, 81, 0.08);
-      backdrop-filter: blur(12px);
-      transition: opacity 0.2s ease, transform 0.2s ease;
-    }
-
-    .center-overlay.hidden {
-      opacity: 0;
-      pointer-events: none;
-      transform: scale(0.96);
-    }
-
-    h1 {
-      margin: 6px 0 8px;
-      font-size: clamp(26px, 6vw, 34px);
-      letter-spacing: 0.04em;
-      color: var(--text);
-    }
-
-    h1 em {
-      font-style: normal;
-      color: var(--gold);
-    }
-
-    p.desc {
-      margin: 0 0 20px;
-      font-size: 14px;
-      line-height: 1.5;
-      color: var(--muted);
-    }
-
-    .btn-gold {
-      width: 100%;
-      border: 0;
-      border-radius: 14px;
-      padding: 15px 20px;
-      font-size: 16px;
-      font-weight: 800;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #120e05;
-      background: linear-gradient(135deg, #ffe08a 0%, var(--gold) 55%, #c8921c 100%);
-      box-shadow: 0 8px 28px var(--gold-glow);
-      cursor: pointer;
-    }
-
-    .btn-gold:active {
-      transform: scale(0.98);
-    }
-
-    .hud-bottom {
-      position: relative;
-      z-index: 2;
-      padding: 14px 18px 22px;
-      text-align: center;
-      font-size: 12px;
-      color: var(--muted);
-      pointer-events: none;
-    }
-
-    .feedback {
-      position: fixed;
-      left: 50%;
-      top: 22%;
-      transform: translate(-50%, -50%);
-      z-index: 2;
-      font-size: 20px;
-      font-weight: 900;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.18s ease;
-      text-shadow: 0 4px 18px rgba(0, 0, 0, 0.9);
-    }
-
-    .feedback.show {
-      opacity: 1;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#0d0b09">
+<title>Imperio Dorado — Juego gratis de OrdenDorado</title>
+<meta name="description" content="Une piezas de oro y construye tu imperio. Juego gratis de OrdenDorado.">
+<style>
+:root{--bg:#0d0b09;--panel:#17140f;--line:#3b3224;--gold:#d4af5f;--gold2:#f3e3b5;--soft:#a99a7c;--cell:#1f1a13}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
+html,body{height:100%;background:var(--bg);color:var(--gold2);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overscroll-behavior:none}
+body{background:radial-gradient(ellipse 120% 70% at 50% 0%,#2b2215 0%,#13100c 55%,var(--bg) 100%) fixed;display:flex;flex-direction:column;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 14px 24px}
+.top{width:100%;max-width:440px;display:flex;justify-content:space-between;align-items:center}
+.brand{font-size:10.5px;letter-spacing:.3em;color:var(--gold);font-weight:700;text-transform:uppercase}
+.icon{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--gold2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
+h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(30px,8vw,40px);margin-top:8px;letter-spacing:.01em;
+   background:linear-gradient(180deg,#fff3cf 0%,#e5c174 55%,#a77d32 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.tag{font-size:13px;color:var(--soft);margin:4px 0 14px;text-align:center}
+.scores{width:100%;max-width:440px;display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px}
+.sc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
+.sc small{display:block;font-size:10px;letter-spacing:.18em;color:var(--soft);text-transform:uppercase}
+.sc b{font-size:22px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
+.undo{border:1px solid var(--line);background:var(--panel);border-radius:14px;color:var(--gold2);padding:0 14px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer}
+.undo:disabled{opacity:.35}
+#board{position:relative;width:min(92vw,440px);aspect-ratio:1;background:linear-gradient(145deg,#211b13,#15110c);border-radius:20px;
+  border:1px solid #4a3d29;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,230,170,.08);touch-action:none;padding:3%}
+.cellbg{position:absolute;border-radius:12%;background:var(--cell);box-shadow:inset 0 2px 6px rgba(0,0,0,.45)}
+.t{position:absolute;border-radius:12%;display:flex;flex-direction:column;align-items:center;justify-content:center;
+   transition:transform 115ms ease-in-out;will-change:transform;z-index:2}
+.t .v{font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 1px 0 rgba(255,255,255,.25)}
+.t .n{font-size:clamp(7px,2.1vw,10px);letter-spacing:.14em;text-transform:uppercase;margin-top:4px;font-weight:700;opacity:.85}
+.t.new{animation:appear 180ms ease-out}
+.t.pop{animation:pop 200ms ease-out}
+@keyframes appear{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
+@keyframes pop{0%{scale:1}45%{scale:1.16}100%{scale:1}}
+.float{position:absolute;z-index:5;font-weight:800;color:var(--gold2);pointer-events:none;font-size:18px;text-shadow:0 2px 8px rgba(0,0,0,.8);animation:up 700ms ease-out forwards}
+@keyframes up{to{transform:translateY(-38px);opacity:0}}
+.spark{position:absolute;z-index:6;width:6px;height:6px;border-radius:50%;pointer-events:none;background:radial-gradient(#fff6d8,#d4af5f);animation:spark 550ms ease-out forwards}
+@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
+.coll{width:100%;max-width:440px;margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
+.coll small{font-size:10px;letter-spacing:.18em;color:var(--soft);text-transform:uppercase}
+.row{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-top:8px}
+.dot{aspect-ratio:1;border-radius:6px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#5a4d38}
+.dot.on{border-color:transparent;color:#1a140b}
+.next{font-size:12px;color:var(--gold2);margin-top:8px}
+.shop{display:block;width:100%;max-width:440px;margin-top:14px;text-align:center;text-decoration:none;padding:15px;border-radius:16px;
+  background:linear-gradient(135deg,#f5e1a6,#d4af5f 55%,#a9822f);color:#17110a;font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:13px;
+  box-shadow:0 8px 28px rgba(212,175,95,.25)}
+.hint{font-size:12px;color:var(--soft);margin-top:10px;text-align:center}
+.toast{position:fixed;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translate(-50%,-250%);background:#1c1710;border:1px solid var(--gold);
+  border-radius:30px;padding:10px 18px;font-size:13px;font-weight:700;color:var(--gold2);z-index:50;transition:transform .35s ease;white-space:nowrap}
+.toast.show{transform:translate(-50%,0)}
+#modal{position:fixed;inset:0;background:rgba(8,6,4,.88);display:none;align-items:center;justify-content:center;z-index:40;padding:20px}
+#modal .box{width:100%;max-width:360px;background:linear-gradient(180deg,#1d1810,#120f0b);border:1px solid var(--gold);border-radius:22px;padding:26px 22px;text-align:center}
+#modal h2{font-family:Georgia,serif;font-weight:400;font-size:30px;margin:6px 0 8px;color:var(--gold2)}
+#modal p{font-size:14px;color:var(--soft);line-height:1.5}
+#modal .big{font-size:40px;font-weight:800;color:var(--gold2);margin:10px 0 2px}
+.btn{display:block;width:100%;margin-top:12px;padding:14px;border-radius:14px;border:0;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;text-align:center}
+.gold{background:linear-gradient(135deg,#f5e1a6,#d4af5f 55%,#a9822f);color:#17110a}
+.line{background:none;border:1px solid var(--gold);color:var(--gold2)}
+@media (prefers-reduced-motion:reduce){.t{transition:none}.t.new,.t.pop{animation:none}}
+</style>
 </head>
 <body>
-  <div id="game-wrap">
-    <canvas id="c"></canvas>
-
-    <div class="hud-top">
-      <div class="brand-tag">Orden Dorado · Krono Pulse 3D</div>
-      <div class="stats">
-        <div class="pill">Puntos: <span id="score">0</span></div>
-        <div class="pill">Racha: <span id="combo">x1</span></div>
-        <div class="pill">Récord: <span id="best">0</span></div>
-      </div>
-    </div>
-
-    <div id="feedback" class="feedback"></div>
-
-    <div id="overlay" class="center-overlay">
-      <div class="brand-tag">Reflejos · Precisión · Ritmo</div>
-      <h1>Krono <em>Pulse</em> 3D</h1>
-      <p id="overlay-text" class="desc">
-        Toca la pantalla (o pulsa <strong>Espacio</strong>) justo cuando el anillo 3D cruce el núcleo dorado. Cada acierto acelera el pulso y sube tu multiplicador.
-      </p>
-      <button id="start-btn" class="btn-gold">Jugar ahora</button>
-    </div>
-
-    <div class="hud-bottom">Toca en cualquier parte o pulsa Espacio · Sin límite de pausa</div>
+<div class="top">
+  <div class="brand">OrdenDorado</div>
+  <div style="display:flex;gap:8px">
+    <button class="icon" id="snd" aria-label="Sonido">♪</button>
+    <button class="icon" id="rst" aria-label="Nueva partida">↻</button>
   </div>
+</div>
+<h1>Imperio Dorado</h1>
+<p class="tag">Desliza para unir piezas iguales. De una pepita… a un imperio.</p>
+<div class="scores">
+  <div class="sc"><small>Puntos</small><b id="score">0</b></div>
+  <div class="sc"><small>Récord</small><b id="best">0</b></div>
+  <button class="undo" id="undo">DESHACER<br><span id="ucount" style="font-weight:400;opacity:.7">x3</span></button>
+</div>
+<div id="board"></div>
+<div class="coll">
+  <small>Tu colección</small>
+  <div class="row" id="row"></div>
+  <div class="next" id="next"></div>
+</div>
+<a class="shop" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">✦ Visita la tienda OrdenDorado</a>
+<p class="hint">Agendas, diarios, libros y plantillas premium</p>
+<div class="toast" id="toast"></div>
+<div id="modal"><div class="box">
+  <div class="brand" id="mk">Fin de la partida</div>
+  <h2 id="mt">Buen intento</h2>
+  <div class="big" id="ms">0</div>
+  <p id="mp"></p>
+  <a class="btn gold" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">Visita la tienda OrdenDorado</a>
+  <button class="btn line" id="share">Retar a un amigo</button>
+  <button class="btn line" id="again">Jugar otra vez</button>
+</div></div>
+<script>
+(()=>{
+const N=4;
+const LV=[null,
+ ["2","Pepita"],["4","Moneda"],["8","Lingote"],["16","Anillo"],["32","Pulsera"],["64","Reloj"],
+ ["128","Collar"],["256","Corona"],["512","Cetro"],["1024","Trono"],["2048","Imperio"],["4096","Leyenda"],["8192","Mito"]];
+const STY=l=>{
+  const t=[null,
+   ["#3a2f22","#2c241a","#c9ab74"],["#4a3a24","#34291a","#e2c48a"],["#6b5028","#4a3519","#f4dca2"],
+   ["#8a6a2e","#5f4519","#fff0c6"],["#a8802f","#76561b","#fff6da"],["#c49a3c","#8c6620","#2a1c08"],
+   ["#ddb54f","#a67a24","#241706"],["#f0cd63","#bf8f2c","#1f1404"],["#ffe08a","#d4a63c","#1a1103"],
+   ["#fff0bd","#e8c060","#1a1103"],["#ffffff","#f3d98d","#1a1103"],["#e8f3ff","#a9c6e8","#0b1726"],["#f6e8ff","#c9a9ef","#1a0b26"]][Math.min(l,13)];
+  return {bg:`linear-gradient(145deg,${t[0]},${t[1]})`,fg:t[2],glow:l>=7?`0 0 ${8+l*2}px rgba(255,214,120,${Math.min(.15+l*.04,.6)})`:"0 3px 10px rgba(0,0,0,.4)"};
+};
+const $=id=>document.getElementById(id);
+const board=$("board");
+let tiles=[],idc=0,score=0,best=0,maxLv=1,hist=[],undos=3,busy=false,sound=true,won=false,ac=null;
+const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
+best=store.get("od_imp_best",0);sound=store.get("od_imp_snd",true);
+let unlocked=store.get("od_imp_unl",1);
 
-  <script>
-    (() => {
-      const canvas = document.getElementById('c');
-      const ctx = canvas.getContext('2d');
-      const scoreEl = document.getElementById('score');
-      const comboEl = document.getElementById('combo');
-      const bestEl = document.getElementById('best');
-      const feedbackEl = document.getElementById('feedback');
-      const overlay = document.getElementById('overlay');
-      const overlayText = document.getElementById('overlay-text');
-      const startBtn = document.getElementById('start-btn');
+function geom(){const s=board.clientWidth,pad=s*.03,gap=s*.025,cs=(s-2*pad-3*gap)/4;return {pad,gap,cs}}
+function pos(r,c){const g=geom();return [g.pad+c*(g.cs+g.gap),g.pad+r*(g.cs+g.gap)]}
+function drawBg(){board.querySelectorAll(".cellbg").forEach(e=>e.remove());const g=geom();
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const d=document.createElement("div");d.className="cellbg";const[x,y]=pos(r,c);
+  Object.assign(d.style,{width:g.cs+"px",height:g.cs+"px",left:x+"px",top:y+"px"});board.appendChild(d)}}
+function paint(t){const g=geom(),s=STY(t.lv),[x,y]=pos(t.r,t.c);const e=t.el;
+  e.style.width=e.style.height=g.cs+"px";e.style.left="0";e.style.top="0";e.style.transform=`translate(${x}px,${y}px)`;
+  e.style.background=s.bg;e.style.color=s.fg;e.style.boxShadow=s.glow+",inset 0 1px 0 rgba(255,255,255,.18)";
+  const v=LV[Math.min(t.lv,13)][0];e.querySelector(".v").textContent=v;
+  e.querySelector(".v").style.fontSize=(g.cs*(v.length>=4?.27:v.length===3?.33:.4))+"px";
+  e.querySelector(".n").textContent=LV[Math.min(t.lv,13)][1]}
+function mk(r,c,lv,cls){const e=document.createElement("div");e.className="t "+(cls||"");e.innerHTML='<div class="v"></div><div class="n"></div>';
+  const t={id:++idc,r,c,lv,el:e};board.appendChild(e);paint(t);tiles.push(t);return t}
+function empty(){const occ=new Set(tiles.map(t=>t.r*N+t.c));const out=[];for(let i=0;i<N*N;i++)if(!occ.has(i))out.push(i);return out}
+function spawn(){const e=empty();if(!e.length)return;const i=e[Math.floor(Math.random()*e.length)];mk(Math.floor(i/N),i%N,Math.random()<.9?1:2,"new")}
+function snapshot(){return {s:score,t:tiles.map(t=>[t.r,t.c,t.lv])}}
+function restore(sn){tiles.forEach(t=>t.el.remove());tiles=[];sn.t.forEach(a=>mk(a[0],a[1],a[2]));score=sn.s;updScore()}
 
-      const STORAGE_KEY = 'ordendorado_krono_pulse_best_v1';
-      let bestScore = Number(localStorage.getItem(STORAGE_KEY) || 0);
-      bestEl.textContent = bestScore;
+function tone(l){if(!sound)return;try{ac=ac||new (window.AudioContext||window.webkitAudioContext)();
+  const o=ac.createOscillator(),g=ac.createGain();o.type="sine";o.frequency.value=330*Math.pow(2,(l-1)/6);
+  g.gain.setValueAtTime(.0001,ac.currentTime);g.gain.exponentialRampToValueAtTime(.12,ac.currentTime+.01);
+  g.gain.exponentialRampToValueAtTime(.0001,ac.currentTime+.35);o.connect(g).connect(ac.destination);o.start();o.stop(ac.currentTime+.4)}catch(e){}}
+function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 
-      let width = 0;
-      let height = 0;
-      let dpr = 1;
+function move(dir){ // 0 up 1 right 2 down 3 left
+  if(busy)return;const before=snapshot();let moved=false,gained=0;const merges=[];
+  for(let k=0;k<N;k++){
+    const line=[];for(let i=0;i<N;i++){let r,c;
+      if(dir===0){r=i;c=k}else if(dir===2){r=N-1-i;c=k}else if(dir===3){r=k;c=i}else{r=k;c=N-1-i}line.push([r,c])}
+    const lt=line.map(([r,c])=>tiles.find(t=>t.r===r&&t.c===c&&!t.dead)).filter(Boolean);
+    const out=[];
+    for(const t of lt){const last=out[out.length-1];
+      if(last&&last.lv===t.lv&&!last.m){t.dead=true;[t.r,t.c]=[last.r,last.c];last.m=true;merges.push(last);moved=true;gained+=Math.pow(2,last.lv+1)}
+      else{const[r,c]=line[out.length];if(t.r!==r||t.c!==c)moved=true;t.r=r;t.c=c;out.push(t)}}
+  }
+  if(!moved)return;
+  busy=true;hist.push(before);if(hist.length>3)hist.shift();
+  tiles.forEach(t=>{const[x,y]=pos(t.r,t.c);t.el.classList.remove("new","pop");t.el.style.transform=`translate(${x}px,${y}px)`;if(t.dead)t.el.style.zIndex=1});
+  setTimeout(()=>{
+    tiles.filter(t=>t.dead).forEach(t=>t.el.remove());tiles=tiles.filter(t=>!t.dead);
+    let top=0;
+    merges.forEach(t=>{t.lv++;t.m=false;paint(t);void t.el.offsetWidth;t.el.classList.add("pop");top=Math.max(top,t.lv);fx(t)});
+    if(merges.length){tone(top);buzz(top>=7?25:8)}
+    score+=gained;updScore();
+    if(top>maxLv){maxLv=top}
+    if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);toast("✦ Desbloqueaste: "+LV[Math.min(top,13)][1]);drawColl()}
+    if(top===11&&!won){won=true;end(true)}
+    spawn();busy=false;updUndo();
+    if(!canMove())setTimeout(()=>end(false),450);
+  },120);
+}
+function canMove(){if(empty().length)return true;const m={};tiles.forEach(t=>m[t.r*N+t.c]=t.lv);
+  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=m[r*N+c];if(c<N-1&&m[r*N+c+1]===v)return true;if(r<N-1&&m[(r+1)*N+c]===v)return true}return false}
+function fx(t){const g=geom(),[x,y]=pos(t.r,t.c),cx=x+g.cs/2,cy=y+g.cs/2;
+  const f=document.createElement("div");f.className="float";f.textContent="+"+Math.pow(2,t.lv);f.style.left=(cx-20)+"px";f.style.top=(cy-16)+"px";board.appendChild(f);setTimeout(()=>f.remove(),720);
+  if(t.lv>=4){const n=Math.min(6+t.lv*2,22);for(let i=0;i<n;i++){const s=document.createElement("div");s.className="spark";const a=Math.random()*6.283,d=g.cs*(.45+Math.random()*.5);
+    s.style.left=cx+"px";s.style.top=cy+"px";s.style.setProperty("--dx",Math.cos(a)*d+"px");s.style.setProperty("--dy",Math.sin(a)*d+"px");board.appendChild(s);setTimeout(()=>s.remove(),580)}}}
+function updScore(){$("score").textContent=score;if(score>best){best=score;store.set("od_imp_best",best)}$("best").textContent=best}
+function updUndo(){$("undo").disabled=!hist.length||!undos;$("ucount").textContent="x"+undos}
+function drawColl(){const row=$("row");row.innerHTML="";for(let l=1;l<=11;l++){const d=document.createElement("div");d.className="dot"+(l<=unlocked?" on":"");
+  if(l<=unlocked){const s=STY(l);d.style.background=s.bg;d.style.color=s.fg}d.textContent=LV[l][0];d.title=LV[l][1];row.appendChild(d)}
+  const nx=Math.min(unlocked+1,11);$("next").innerHTML=unlocked>=11?"✦ Completaste la colección. Eres leyenda.":`Próximo objetivo: <b>${LV[nx][1]}</b> (${LV[nx][0]})`}
+let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2200)}
+function end(win){$("mk").textContent=win?"¡Lo lograste!":"Fin de la partida";$("mt").textContent=win?"Construiste tu Imperio":"Buen intento";
+  $("ms").textContent=score;$("mp").innerHTML=(win?"Llegaste al Imperio (2048). Puedes seguir jugando o empezar de nuevo.":"Llegaste a <b>"+LV[Math.min(maxLv,13)][1]+"</b>.")+"<br>Récord: "+best;
+  $("modal").style.display="flex";$("again").textContent=win?"Seguir jugando":"Jugar otra vez";$("again").dataset.cont=win?"1":""}
+function start(){tiles.forEach(t=>t.el.remove());tiles=[];score=0;maxLv=1;hist=[];undos=3;won=false;updScore();spawn();spawn();updUndo();$("modal").style.display="none"}
 
-      function resize() {
-        dpr = Math.min(window.devicePixelRatio || 1, 2);
-        width = window.innerWidth;
-        height = window.innerHeight;
-        canvas.width = Math.floor(width * dpr);
-        canvas.height = Math.floor(height * dpr);
-        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      }
-
-      window.addEventListener('resize', resize);
-      resize();
-
-      let state = 'menu'; // 'menu' | 'playing' | 'gameover'
-      let score = 0;
-      let streak = 0;
-      let ringRadius = 1;
-      let targetRadius = 72;
-      let shrinkSpeed = 165;
-      let pulseTime = 0;
-      let shake = 0;
-      let particles = [];
-      let feedbackTimer = null;
-
-      function showFeedback(text, color) {
-        feedbackEl.textContent = text;
-        feedbackEl.style.color = color;
-        feedbackEl.classList.add('show');
-        clearTimeout(feedbackTimer);
-        feedbackTimer = setTimeout(() => feedbackEl.classList.remove('show'), 380);
-      }
-
-      function spawnBurst(cx, cy, color, count) {
-        for (let i = 0; i < count; i++) {
-          const angle = (Math.PI * 2 * i) / count + (Math.random() - 0.5) * 0.4;
-          const speed = 90 + Math.random() * 210;
-          particles.push({
-            x: cx,
-            y: cy,
-            vx: Math.cos(angle) * speed,
-            vy: Math.sin(angle) * speed,
-            life: 1,
-            decay: 1.6 + Math.random() * 1.1,
-            size: 2.5 + Math.random() * 3,
-            color
-          });
-        }
-      }
-
-      function resetRing() {
-        const minDim = Math.min(width, height);
-        targetRadius = Math.max(54, Math.min(86, minDim * 0.16));
-        ringRadius = Math.max(width, height) * 0.46;
-      }
-
-      function startGame() {
-        score = 0;
-        streak = 0;
-        shrinkSpeed = 175;
-        particles = [];
-        shake = 0;
-        state = 'playing';
-        scoreEl.textContent = '0';
-        comboEl.textContent = 'x1';
-        overlay.classList.add('hidden');
-        resetRing();
-        showFeedback('¡ENFOCA!', '#f5c451');
-      }
-
-      function gameOver(reason) {
-        state = 'gameover';
-        shake = 14;
-        if (score > bestScore) {
-          bestScore = score;
-          localStorage.setItem(STORAGE_KEY, String(bestScore));
-          bestEl.textContent = bestScore;
-        }
-        overlayText.innerHTML = `${reason}<br>Puntuación final: <strong>${score}</strong> · Récord: <strong>${bestScore}</strong>`;
-        startBtn.textContent = 'Reintentar';
-        overlay.classList.remove('hidden');
-      }
-
-      function handlePulseInput() {
-        if (state !== 'playing') return;
-
-        const cx = width * 0.5;
-        const cy = height * 0.52;
-        const diff = Math.abs(ringRadius - targetRadius);
-        const multiplier = 1 + Math.floor(streak / 4);
-
-        if (diff <= 14) {
-          streak += 1;
-          const nextMult = 1 + Math.floor(streak / 4);
-          score += 100 * nextMult;
-          shrinkSpeed = Math.min(540, shrinkSpeed + 11);
-          scoreEl.textContent = score;
-          comboEl.textContent = `x${nextMult}`;
-          spawnBurst(cx, cy, '#f5c451', 18);
-          showFeedback(diff <= 5 ? `PERFECTO +${100 * nextMult}` : `BIEN +${100 * nextMult}`, '#5be39d');
-          resetRing();
-        } else if (diff <= 34) {
-          streak += 1;
-          const nextMult = 1 + Math.floor(streak / 4);
-          score += 50 * nextMult;
-          shrinkSpeed = Math.min(540, shrinkSpeed + 6);
-          scoreEl.textContent = score;
-          comboEl.textContent = `x${nextMult}`;
-          spawnBurst(cx, cy, '#ffe08a', 10);
-          showFeedback(`AJUSTADO +${50 * nextMult}`, '#f5c451');
-          resetRing();
-        } else {
-          spawnBurst(cx, cy, '#ff4d5a', 20);
-          gameOver('Pulso fuera de sincronía.');
-        }
-      }
-
-      startBtn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        startGame();
-      });
-
-      window.addEventListener('pointerdown', (e) => {
-        if (e.target === startBtn) return;
-        if (state === 'playing') handlePulseInput();
-      });
-
-      window.addEventListener('keydown', (e) => {
-        if (e.code === 'Space') {
-          e.preventDefault();
-          if (state === 'playing') {
-            handlePulseInput();
-          } else {
-            startGame();
-          }
-        }
-      });
-
-      let lastTime = performance.now();
-
-      function draw3DScene(dt) {
-        pulseTime += dt;
-        const cx = width * 0.5;
-        const cy = height * 0.52;
-
-        ctx.save();
-        if (shake > 0) {
-          const sx = (Math.random() - 0.5) * shake;
-          const sy = (Math.random() - 0.5) * shake;
-          ctx.translate(sx, sy);
-          shake = Math.max(0, shake - dt * 42);
-        }
-
-        ctx.clearRect(0, 0, width, height);
-
-        // Perspectiva de rejilla 3D inferior
-        const horizonY = height * 0.54;
-        ctx.strokeStyle = 'rgba(245, 196, 81, 0.11)';
-        ctx.lineWidth = 1;
-        for (let i = -8; i <= 8; i++) {
-          ctx.beginPath();
-          ctx.moveTo(cx + i * 28, horizonY);
-          ctx.lineTo(cx + i * 135, height + 20);
-          ctx.stroke();
-        }
-        for (let row = 1; row <= 7; row++) {
-          const t = Math.pow(row / 7, 1.7);
-          const y = horizonY + t * (height - horizonY);
-          ctx.beginPath();
-          ctx.moveTo(0, y);
-          ctx.lineTo(width, y);
-          ctx.stroke();
-        }
-
-        // Anillo objetivo 3D (inclinación sutil y resplandor)
-        const tiltY = 0.86 + Math.sin(pulseTime * 2.2) * 0.04;
-        ctx.save();
-        ctx.translate(cx, cy);
-        ctx.scale(1, tiltY);
-
-        ctx.beginPath();
-        ctx.arc(0, 0, targetRadius, 0, Math.PI * 2);
-        ctx.strokeStyle = 'rgba(245, 196, 81, 0.35)';
-        ctx.lineWidth = 3;
-        ctx.stroke();
-
-        // Núcleo central 3D
-        const coreGrad = ctx.createRadialGradient(-10, -10, 4, 0, 0, targetRadius * 0.62);
-        coreGrad.addColorStop(0, '#fff0b8');
-        coreGrad.addColorStop(0.45, '#f5c451');
-        coreGrad.addColorStop(1, '#7c550b');
-        ctx.beginPath();
-        ctx.arc(0, 0, targetRadius * 0.55 + Math.sin(pulseTime * 6) * 2, 0, Math.PI * 2);
-        ctx.fillStyle = coreGrad;
-        ctx.shadowColor = 'rgba(245, 196, 81, 0.55)';
-        ctx.shadowBlur = 24;
-        ctx.fill();
-        ctx.shadowBlur = 0;
-
-        // Anillo entrante
-        if (state === 'playing') {
-          const dist = Math.abs(ringRadius - targetRadius);
-          const activeColor = dist <= 14 ? '#5be39d' : dist <= 34 ? '#f5c451' : '#f7f5ef';
-          ctx.beginPath();
-          ctx.arc(0, 0, Math.max(4, ringRadius), 0, Math.PI * 2);
-          ctx.strokeStyle = activeColor;
-          ctx.lineWidth = 4.5;
-          ctx.stroke();
-        }
-
-        ctx.restore();
-
-        // Partículas
-        for (let i = particles.length - 1; i >= 0; i--) {
-          const p = particles[i];
-          p.x += p.vx * dt;
-          p.y += p.vy * dt;
-          p.life -= p.decay * dt;
-          if (p.life <= 0) {
-            particles.splice(i, 1);
-            continue;
-          }
-          ctx.globalAlpha = Math.max(0, p.life);
-          ctx.fillStyle = p.color;
-          ctx.beginPath();
-          ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        ctx.globalAlpha = 1;
-
-        ctx.restore();
-      }
-
-      function loop(now) {
-        const dt = Math.min(0.05, (now - lastTime) / 1000);
-        lastTime = now;
-
-        if (state === 'playing') {
-          ringRadius -= shrinkSpeed * dt;
-          if (ringRadius < targetRadius - 36) {
-            spawnBurst(width * 0.5, height * 0.52, '#ff4d5a', 18);
-            gameOver('Se cerró el pulso antes de tocar.');
-          }
-        }
-
-        draw3DScene(dt);
-        requestAnimationFrame(loop);
-      }
-
-      requestAnimationFrame(loop);
-    })();
-  </script>
+// input
+let sx=0,sy=0,st=0;
+board.addEventListener("touchstart",e=>{const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=1},{passive:true});
+board.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
+board.addEventListener("touchend",e=>{if(!st)return;st=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;
+  if(Math.max(Math.abs(dx),Math.abs(dy))<22)return;Math.abs(dx)>Math.abs(dy)?move(dx>0?1:3):move(dy>0?2:0)});
+let mx=0,my=0,md=false;
+board.addEventListener("mousedown",e=>{md=true;mx=e.clientX;my=e.clientY});
+window.addEventListener("mouseup",e=>{if(!md)return;md=false;const dx=e.clientX-mx,dy=e.clientY-my;if(Math.max(Math.abs(dx),Math.abs(dy))<22)return;
+  Math.abs(dx)>Math.abs(dy)?move(dx>0?1:3):move(dy>0?2:0)});
+window.addEventListener("keydown",e=>{const k={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3}[e.key];if(k!==undefined){e.preventDefault();move(k)}});
+$("undo").onclick=()=>{if(busy||!hist.length||!undos)return;restore(hist.pop());undos--;updUndo()};
+$("rst").onclick=()=>{if(confirmReset())start()};
+function confirmReset(){return score<200||window.confirm("¿Empezar una partida nueva?")}
+$("snd").onclick=()=>{sound=!sound;store.set("od_imp_snd",sound);$("snd").style.opacity=sound?1:.4;if(sound)tone(5)};
+$("snd").style.opacity=sound?1:.4;
+$("again").onclick=()=>{if($("again").dataset.cont){$("modal").style.display="none"}else start()};
+$("share").onclick=async()=>{const txt=`Hice ${score} puntos en Imperio Dorado ✦ ¿Me superas?`;const url=location.href;
+  try{if(navigator.share){await navigator.share({title:"Imperio Dorado",text:txt,url});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(txt+" "+url);toast("Enlace copiado")}catch(e){toast(url)}};
+window.addEventListener("resize",()=>{drawBg();tiles.forEach(paint)});
+drawBg();drawColl();start();
+})();
+</script>
 </body>
 </html>
