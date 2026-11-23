@@ -82,10 +82,20 @@ h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(3
   <small>Tu colección</small>
   <div class="row" id="row"></div>
   <div class="next" id="next"></div>
+  <div class="next" style="color:#d4af5f">🎁 Llega a la <b>Corona (256)</b> y gana un <b>15% de descuento</b> en la tienda</div>
 </div>
 <a class="shop" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">✦ Visita la tienda OrdenDorado</a>
 <p class="hint">Agendas, diarios, libros y plantillas premium</p>
 <div class="toast" id="toast"></div>
+<div id="gift" style="position:fixed;inset:0;background:rgba(8,6,4,.9);display:none;align-items:center;justify-content:center;z-index:45;padding:20px"><div class="box" style="width:100%;max-width:360px;background:linear-gradient(180deg,#221b11,#120f0b);border:1px solid #d4af5f;border-radius:22px;padding:26px 22px;text-align:center">
+  <div class="brand">¡Desbloqueaste la Corona!</div>
+  <h2 style="font-family:Georgia,serif;font-weight:400;font-size:28px;margin:8px 0;color:#f3e3b5">Tu premio: 15% de descuento</h2>
+  <p style="font-size:14px;color:#a99a7c;line-height:1.5">Usa este código en la tienda OrdenDorado de Etsy al pagar:</p>
+  <div id="code" style="margin:14px auto 4px;padding:14px;border:2px dashed #d4af5f;border-radius:14px;font-size:28px;font-weight:800;letter-spacing:.12em;color:#f3e3b5">IMPERIO15</div>
+  <button class="btn line" id="copy">Copiar código</button>
+  <a class="btn gold" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">Usarlo en la tienda</a>
+  <button class="btn line" id="keep">Seguir jugando</button>
+</div></div>
 <div id="modal"><div class="box">
   <div class="brand" id="mk">Fin de la partida</div>
   <h2 id="mt">Buen intento</h2>
@@ -111,7 +121,7 @@ const STY=l=>{
 };
 const $=id=>document.getElementById(id);
 const board=$("board");
-let tiles=[],idc=0,score=0,best=0,maxLv=1,hist=[],undos=3,busy=false,sound=true,won=false,ac=null;
+let tiles=[],idc=0,score=0,best=0,maxLv=1,hist=[],undos=3,busy=false,sound=true,won=false,gifted=false,ac=null;
 const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
 best=store.get("od_imp_best",0);sound=store.get("od_imp_snd",true);
 let unlocked=store.get("od_imp_unl",1);
@@ -162,6 +172,7 @@ function move(dir){ // 0 up 1 right 2 down 3 left
     score+=gained;updScore();
     if(top>maxLv){maxLv=top}
     if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);toast("✦ Desbloqueaste: "+LV[Math.min(top,13)][1]);drawColl()}
+    if(top>=8&&!gifted){gifted=true;setTimeout(()=>{$("gift").style.display="flex";buzz(60)},350)}
     if(top===11&&!won){won=true;end(true)}
     spawn();busy=false;updUndo();
     if(!canMove())setTimeout(()=>end(false),450);
@@ -182,7 +193,7 @@ let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("sho
 function end(win){$("mk").textContent=win?"¡Lo lograste!":"Fin de la partida";$("mt").textContent=win?"Construiste tu Imperio":"Buen intento";
   $("ms").textContent=score;$("mp").innerHTML=(win?"Llegaste al Imperio (2048). Puedes seguir jugando o empezar de nuevo.":"Llegaste a <b>"+LV[Math.min(maxLv,13)][1]+"</b>.")+"<br>Récord: "+best;
   $("modal").style.display="flex";$("again").textContent=win?"Seguir jugando":"Jugar otra vez";$("again").dataset.cont=win?"1":""}
-function start(){tiles.forEach(t=>t.el.remove());tiles=[];score=0;maxLv=1;hist=[];undos=3;won=false;updScore();spawn();spawn();updUndo();$("modal").style.display="none"}
+function start(){tiles.forEach(t=>t.el.remove());tiles=[];score=0;maxLv=1;hist=[];undos=3;won=false;gifted=false;updScore();spawn();spawn();updUndo();$("modal").style.display="none"}
 
 // input
 let sx=0,sy=0,st=0;
@@ -204,6 +215,8 @@ $("again").onclick=()=>{if($("again").dataset.cont){$("modal").style.display="no
 $("share").onclick=async()=>{const txt=`Hice ${score} puntos en Imperio Dorado ✦ ¿Me superas?`;const url=location.href;
   try{if(navigator.share){await navigator.share({title:"Imperio Dorado",text:txt,url});return}}catch(e){return}
   try{await navigator.clipboard.writeText(txt+" "+url);toast("Enlace copiado")}catch(e){toast(url)}};
+$("copy").onclick=async()=>{try{await navigator.clipboard.writeText("IMPERIO15");toast("Código copiado")}catch(e){toast("Código: IMPERIO15")}};
+$("keep").onclick=()=>{$("gift").style.display="none"};
 window.addEventListener("resize",()=>{drawBg();tiles.forEach(paint)});
 drawBg();drawColl();start();
 })();
