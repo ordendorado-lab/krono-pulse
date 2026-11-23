@@ -156,8 +156,13 @@ function slide(){note(180,0,.06,.03,"triangle")}
 function tone(l,count){const base=262*Math.pow(2,(l-1)/7);bell(base,0,.16);
   if(l>=4)coin(.03);
   if(count>1){for(let i=1;i<Math.min(count,4);i++)bell(base*Math.pow(2,(i*4)/12),i*.07,.12)}}
-function fanfare(){[523,659,784,1047].forEach((f,i)=>bell(f,i*.11,.16));coin(.45);coin(.6)}
-function jackpot(){[523,659,784,1047,1319,1568].forEach((f,i)=>bell(f,i*.09,.17));for(let i=0;i<8;i++)coin(.55+i*.07)}
+function brass(f,t0,dur,vol){note(f,t0,dur,vol,"sawtooth");note(f*1.003,t0,dur,vol*.6,"square");note(f/2,t0,dur,vol*.5,"triangle")}
+function fanfare(){ // "¡Ganador!": ta-ta-ta-taaaa + acorde + monedas
+  const a=[523,659,784];a.forEach((f,i)=>brass(f,i*.12,.14,.045));
+  [523,659,784,1047].forEach(f=>brass(f,.38,.75,.04));
+  bell(1047,.38,.18);bell(1568,.5,.12);for(let i=0;i<6;i++)coin(.55+i*.06)}
+function jackpot(){fanfare();[784,988,1175,1568,1976].forEach((f,i)=>bell(f,1.05+i*.08,.17));
+  [523,659,784,1047,1319].forEach(f=>brass(f,1.5,1.1,.035));for(let i=0;i<14;i++)coin(1.5+i*.06)}
 function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
 
 function move(dir){ // 0 up 1 right 2 down 3 left
@@ -180,8 +185,9 @@ function move(dir){ // 0 up 1 right 2 down 3 left
     merges.forEach(t=>{t.lv++;t.m=false;paint(t);void t.el.offsetWidth;t.el.classList.add("pop");top=Math.max(top,t.lv);fx(t)});
     if(merges.length){tone(top,merges.length);buzz(top>=7?25:8)}else slide();
     score+=gained;updScore();
+    if(top>maxLv&&top>=4&&top<9){toast("🏆 ¡Objetivo logrado: "+LV[top][1]+"!");fanfare();buzz([40,40,80])}
     if(top>maxLv){maxLv=top}
-    if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);toast("✦ Desbloqueaste: "+LV[Math.min(top,13)][1]);drawColl();if(top<9)fanfare()}
+    if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);drawColl()}
     if(top>=9&&!gifted){jackpot();}
     if(top>=9&&!gifted){gifted=true;setTimeout(()=>{$("gift").style.display="flex";buzz(60)},350)}
     if(top===11&&!won){won=true;end(true)}
