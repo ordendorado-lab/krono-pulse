@@ -108,6 +108,10 @@ const T={
    ['kick','Encabezado','Ven a celebrar conmigo'],['age','Edad (número)','30'],['title','Nombre','Sofía'],
    ['date','Fecha','Sábado 16 de enero'],['time','Hora','20:30'],['place','Lugar','Terraza Dorada, Valencia'],
    ['msg','Mensaje','Música, buena comida y mejores amigos.'],['rsvp','Confirmar a','Sofía · 600 123 456']]},
+ nino:{tab:'Cumple infantil',file:'Invitacion_Cumple_Infantil',photo:true,f:[
+   ['kick','Encabezado','Estás invitado al cumple de'],['title','Nombre','Mateo'],['age','Edad (número)','5'],
+   ['date','Fecha','Sábado 20 de febrero'],['time','Hora','17:00'],['place','Lugar','Parque de Bolas Arcoíris, Málaga'],
+   ['msg','Mensaje','Habrá piñata, juegos y mucha tarta. ¡Te esperamos!'],['rsvp','Confirmar a','Mamá de Mateo · 600 123 456']]},
  boda:{tab:'Boda',file:'Invitacion_Boda',f:[
    ['kick','Encabezado','Tenemos el honor de invitarte a nuestra boda'],['title','Nombres','Lucía & Daniel'],
    ['date','Fecha','Sábado 12 de junio de 2027'],['time','Hora','18:00'],
@@ -121,6 +125,7 @@ try{const s=JSON.parse(localStorage.getItem('od_inv_data')||'null');if(s)for(con
 /* ---------- drawing helpers ---------- */
 function gold(x1,y1,x2,y2){const g=ctx.createLinearGradient(x1,y1,x2,y2);
  g.addColorStop(0,'#8c6d33');g.addColorStop(.35,'#f3e2b0');g.addColorStop(.55,'#c9a868');g.addColorStop(.8,'#fff1c9');g.addColorStop(1,'#9a7a3c');return g}
+function darkGold(x1,y1,x2,y2){const g=ctx.createLinearGradient(x1,y1,x2,y2);g.addColorStop(0,'#7a5a1e');g.addColorStop(.4,'#c99a3a');g.addColorStop(.6,'#9c7428');g.addColorStop(1,'#d6ad55');return g}
 function font(px,fam,w='',st=''){ctx.font=`${st} ${w} ${px}px ${fam}`}
 function wrap(text,maxW){const words=String(text||'').split(/\s+/);const out=[];let line='';
  for(const w of words){const t=line?line+' '+w:w;if(ctx.measureText(t).width>maxW&&line){out.push(line);line=w}else line=t}
@@ -132,7 +137,7 @@ function centered(text,y,fam,size,fill,w='',st='',maxW=860,lh=1.25){
 function diamond(x,y,s){ctx.beginPath();ctx.moveTo(x,y-s);ctx.lineTo(x+s*.7,y);ctx.lineTo(x,y+s);ctx.lineTo(x-s*.7,y);ctx.closePath();ctx.fill()}
 function ornament(y,w=300){ctx.strokeStyle=gold(W/2-w/2,0,W/2+w/2,0);ctx.lineWidth=2;
  ctx.beginPath();ctx.moveTo(W/2-w/2,y);ctx.lineTo(W/2-16,y);ctx.moveTo(W/2+16,y);ctx.lineTo(W/2+w/2,y);ctx.stroke();
- ctx.fillStyle='#e9d7a8';diamond(W/2,y,8);diamond(W/2-w/2-8,y,4);diamond(W/2+w/2+8,y,4)}
+ ctx.fillStyle=PAL.orn;diamond(W/2,y,8);diamond(W/2-w/2-8,y,4);diamond(W/2+w/2+8,y,4)}
 function rnd(seed){let s=seed;return()=>(s=(s*16807)%2147483647)/2147483647}
 function frame(){ctx.strokeStyle=gold(0,0,W,H);ctx.lineWidth=4;ctx.strokeRect(40,40,W-80,H-80);
  ctx.lineWidth=1.5;ctx.strokeRect(56,56,W-112,H-112);
@@ -156,6 +161,7 @@ function balloon(x,y,r,a){ctx.save();ctx.translate(x,y);ctx.rotate(a);
  ctx.fillStyle=g;ctx.beginPath();ctx.ellipse(0,0,r*.85,r,0,0,Math.PI*2);ctx.fill();
  ctx.fillStyle='#8c6d33';ctx.beginPath();ctx.moveTo(-7,r);ctx.lineTo(7,r);ctx.lineTo(0,r+12);ctx.fill();
  ctx.strokeStyle='rgba(201,168,104,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,r+12);ctx.bezierCurveTo(20,r+70,-20,r+120,10,r+190);ctx.stroke();ctx.restore()}
+function starP(x,y,r,c){ctx.fillStyle=c;ctx.beginPath();for(let i=0;i<10;i++){const a=-Math.PI/2+i*Math.PI/5,rr=i%2?r*.45:r;ctx.lineTo(x+Math.cos(a)*rr,y+Math.sin(a)*rr)}ctx.closePath();ctx.fill()}
 function rings(x,y){ctx.lineWidth=9;ctx.strokeStyle=gold(x-90,y-60,x+90,y+60);
  ctx.beginPath();ctx.arc(x-32,y,52,0,7);ctx.stroke();ctx.beginPath();ctx.arc(x+32,y,52,0,7);ctx.stroke();
  ctx.fillStyle='#fff6dc';diamond(x+32,y-58,10)}
@@ -163,20 +169,24 @@ function laurel(cx,cy,r,dir){for(let i=0;i<9;i++){const a=(dir>0?-.25:Math.PI+.2
  ctx.save();ctx.translate(x,y);ctx.rotate(a+dir*1.2);ctx.fillStyle=gold(-10,-20,10,20);ctx.beginPath();ctx.ellipse(0,0,8,20,0,0,7);ctx.fill();ctx.restore()}}
 
 /* ---------- layouts ---------- */
+const DARKPAL={date:'#f3e6c8',time:'#c9a868',place:'#efe6d2',msg:'#e9d7a8',label:'#c9a868',rsvp:'#efe6d2',host:'#e9d7a8',orn:'#e9d7a8',light:false};
+const KIDPAL={date:'#2b3a67',time:'#b0832e',place:'#3d4a70',msg:'#6a5a3a',label:'#b0832e',rsvp:'#2b3a67',host:'#2b3a67',orn:'#c99a3a',light:true};
+let PAL=DARKPAL;
+let K=1,LASTY=0;
 function details(d,y){
- ornament(y);y+=88;
- y=centered(d.date,y,'ODSerif',60,'#f3e6c8','400')+74;
- y=centered(d.time,y,'ODSans',40,'#c9a868','400')+72;
- y=centered(d.place,y,'ODSans',36,'#efe6d2','300','',820,1.3)+86;
- ctx.globalAlpha=.92;y=centered(d.msg,y,'ODSerif',42,'#e9d7a8','400','italic',800,1.3)+86;ctx.globalAlpha=1;
- ornament(y,180);y+=58;
- font(24,'ODSans','500');ctx.fillStyle='#c9a868';ctx.textAlign='center';ctx.fillText(labelRSVP().toUpperCase().split('').join(' '),W/2,y);
- centered(d.rsvp,y+50,'ODSans',34,'#efe6d2','300');
+ ornament(y);y+=88*K;
+ y=centered(d.date,y,'ODSerif',60*K,PAL.date,'400','',860)+74*K;
+ y=centered(d.time,y,'ODSans',40*K,PAL.time,'400')+72*K;
+ y=centered(d.place,y,'ODSans',36*K,PAL.place,'300','',820,1.3)+86*K;
+ ctx.globalAlpha=.92;y=centered(d.msg,y,'ODSerif',42*K,PAL.msg,'400','italic',800,1.3)+86*K;ctx.globalAlpha=1;
+ ornament(y,180);y+=58*K;
+ font(24*K,'ODSans','500');ctx.fillStyle=PAL.label;ctx.textAlign='center';ctx.fillText(labelRSVP().toUpperCase().split('').join(' '),W/2,y);
+ LASTY=centered(d.rsvp,y+50*K,'ODSans',34*K,PAL.rsvp,'300','',820)+20*K;
 }
 function labelRSVP(){return cur==='boda'?'Confirma tu asistencia':'Confirma tu asistencia'}
-function title(text,y,size){const s=fitText(text,'ODSerif',size,880,'','italic');ctx.fillStyle=gold(150,y-s,W-150,y+s/2);
- ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor='rgba(0,0,0,.6)';ctx.shadowBlur=18;ctx.fillText(text,W/2,y);ctx.shadowBlur=0;return s}
-function kicker(text,y){font(26,'ODSans','500');ctx.fillStyle='#c9a868';ctx.textAlign='center';ctx.textBaseline='middle';
+function title(text,y,size){const s=fitText(text,'ODSerif',size,880,'','italic');ctx.fillStyle=PAL.light?darkGold(150,y-s,W-150,y+s/2):gold(150,y-s,W-150,y+s/2);
+ ctx.textAlign='center';ctx.textBaseline='middle';ctx.shadowColor=PAL.light?'rgba(176,131,46,.25)':'rgba(0,0,0,.6)';ctx.shadowBlur=PAL.light?6:18;ctx.fillText(text,W/2,y);ctx.shadowBlur=0;return s}
+function kicker(text,y){font(26,'ODSans','500');ctx.fillStyle=PAL.label;ctx.textAlign='center';ctx.textBaseline='middle';
  const t=String(text).toUpperCase();const sp=t.length>34?'':' ';const out=t.split('').join(sp);
  const s=fitText(out,'ODSans',26,860,'500');ctx.fillText(out,W/2,y)}
 
@@ -203,13 +213,31 @@ const DRAW={
   title(d.title,585,130);
   if(photo){font(34,'ODSans','400');ctx.fillStyle='#c9a868';ctx.fillText(`${d.age} años`.toUpperCase().split('').join(' '),W/2,680)}
   details(d,photo?730:690)},
+ nino(d){PAL=KIDPAL;const g=ctx.createRadialGradient(W/2,H*.4,60,W/2,H/2,H*.85);g.addColorStop(0,'#fffaf0');g.addColorStop(1,'#f3e6cf');ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+  const r=rnd(21),cols=['#f6b8c8','#a8dcc8','#a9cdf0','#f7dc8a','#d4b8f0'];
+  for(let i=0;i<70;i++){ctx.fillStyle=cols[i%5];ctx.globalAlpha=.75;const x=80+r()*(W-160),y=80+r()*(H-160);if(y>360&&y<1180&&x>150&&x<930)continue;
+   ctx.save();ctx.translate(x,y);ctx.rotate(r()*3);i%3?ctx.fillRect(-7,-3,14,6):(ctx.beginPath(),ctx.arc(0,0,5,0,7),ctx.fill());ctx.restore()}ctx.globalAlpha=1;
+  const kb=(x,y,rad,a,c)=>{ctx.save();ctx.translate(x,y);ctx.rotate(a);const gg=ctx.createRadialGradient(-rad*.35,-rad*.4,rad*.1,0,0,rad*1.2);gg.addColorStop(0,'#ffffff');gg.addColorStop(.35,c);gg.addColorStop(1,c);
+   ctx.fillStyle=gg;ctx.beginPath();ctx.ellipse(0,0,rad*.85,rad,0,0,7);ctx.fill();ctx.fillStyle=c;ctx.beginPath();ctx.moveTo(-7,rad);ctx.lineTo(7,rad);ctx.lineTo(0,rad+12);ctx.fill();
+   ctx.strokeStyle='rgba(176,131,46,.7)';ctx.lineWidth=2;ctx.beginPath();ctx.moveTo(0,rad+12);ctx.bezierCurveTo(20,rad+70,-20,rad+120,10,rad+190);ctx.stroke();ctx.restore()};
+  kb(170,250,70,-.2,'#f6b8c8');kb(W-170,240,76,.18,'#a9cdf0');kb(105,440,48,-.1,'#a8dcc8');kb(W-115,455,50,.12,'#f7dc8a');
+  ctx.strokeStyle=darkGold(0,0,W,H);ctx.lineWidth=4;ctx.strokeRect(40,40,W-80,H-80);ctx.lineWidth=1.5;ctx.strokeRect(56,56,W-112,H-112);
+  ctx.fillStyle='#c99a3a';[[56,56],[W-56,56],[56,H-56],[W-56,H-56]].forEach(([x,y])=>diamond(x,y,9));
+  kicker(d.kick,118);
+  if(photo){const rr=118,cx=W/2,cy=330;ctx.save();ctx.beginPath();ctx.arc(cx,cy,rr,0,7);ctx.clip();const sc=Math.max(2*rr/photo.width,2*rr/photo.height);
+    ctx.drawImage(photo,cx-photo.width*sc/2,cy-photo.height*sc/2,photo.width*sc,photo.height*sc);ctx.restore();ctx.lineWidth=7;ctx.strokeStyle=darkGold(cx-rr,cy-rr,cx+rr,cy+rr);ctx.beginPath();ctx.arc(cx,cy,rr+4,0,7);ctx.stroke()}
+  else{fitText(d.age,'ODSerif',270,500);ctx.fillStyle=darkGold(W/2-200,200,W/2+200,460);ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(d.age,W/2,330);
+    [[W/2-165,255,18,0],[W/2+165,255,18,2],[W/2-195,385,13,4],[W/2+195,385,13,1]].forEach(([x,y,r,c])=>starP(x,y,r,cols[c]))}
+  title(d.title,560,130);
+  font(34,'ODSans','500');ctx.fillStyle='#b0832e';ctx.textAlign='center';ctx.fillText(`¡CUMPLE ${d.age} AÑOS!`.split('').join(' '),W/2,650);
+  details(d,700)},
  boda(d){bg('#1a1711','#060504');sparkles(30,11,[80,80,W-80,H-80]);frame();
   rings(W/2,250);kicker(d.kick,400);title(d.title,540,140);details(d,680)},
 };
 function watermark(){ctx.save();ctx.translate(W/2,H/2);ctx.rotate(-Math.PI/6);
- font(92,'ODSans','500');ctx.fillStyle='rgba(255,255,255,.13)';ctx.textAlign='center';
+ font(92,'ODSans','500');ctx.fillStyle=PAL.light?'rgba(60,40,10,.12)':'rgba(255,255,255,.13)';ctx.textAlign='center';
  for(let i=-3;i<=3;i++)ctx.fillText('M U E S T R A  ·  O R D E N D O R A D O',0,i*230);ctx.restore()}
-function render(){ctx.clearRect(0,0,W,H);DRAW[cur](data[cur]);if(!unlocked)watermark()}
+function render(){K=1;for(let i=0;i<8;i++){ctx.clearRect(0,0,W,H);PAL=DARKPAL;DRAW[cur](data[cur]);if(LASTY<=H-78)break;K-=.06}if(!unlocked)watermark()}
 
 /* ---------- UI ---------- */
 const tabs=document.getElementById('tabs'),form=document.getElementById('form');
@@ -251,6 +279,7 @@ const SONGS={
  navidad:{bpm:150,n:'E4 1,E4 1,E4 2,E4 1,E4 1,E4 2,E4 1,G4 1,C4 1.5,D4 .5,E4 4,F4 1,F4 1,F4 1.5,F4 .5,F4 1,E4 1,E4 1,E4 .5,E4 .5,E4 1,D4 1,D4 1,E4 1,D4 2,G4 2'},
  fin:{bpm:120,n:'G4 1,C5 1.5,C5 .5,C5 1,E5 1,D5 1.5,C5 .5,D5 1,E5 1,C5 1.5,C5 .5,E5 1,G5 1,A5 3,A5 1,G5 1.5,E5 .5,E5 1,C5 1,D5 1.5,C5 .5,D5 1,E5 1,C5 1.5,A4 .5,A4 1,G4 1,C5 4'},
  cumple:{bpm:120,n:'G4 .75,G4 .25,A4 1,G4 1,C5 1,B4 2,G4 .75,G4 .25,A4 1,G4 1,D5 1,C5 2,G4 .75,G4 .25,G5 1,E5 1,C5 1,B4 1,A4 2,F5 .75,F5 .25,E5 1,C5 1,D5 1,C5 3'},
+ nino:{bpm:140,box:true,n:'G4 .75,G4 .25,A4 1,G4 1,C5 1,B4 2,G4 .75,G4 .25,A4 1,G4 1,D5 1,C5 2,G4 .75,G4 .25,G5 1,E5 1,C5 1,B4 1,A4 2,F5 .75,F5 .25,E5 1,C5 1,D5 1,C5 3'},
  boda:{bpm:72,n:'G4 1,C5 .75,C5 .25,C5 2,G4 1,D5 .75,B4 .25,C5 2,G4 1,C5 .75,F5 .25,F5 1,E5 .75,D5 .25,C5 1,B4 .75,C5 .25,D5 3'},
 };
 let actx=null,master=null,bus=null,loopT=null,musicOn=true,started=false;
@@ -263,7 +292,7 @@ function bell(out,t,f,dur){const g=actx.createGain();g.connect(out);
 function pad(out,t,f,dur){const o=actx.createOscillator(),g=actx.createGain();o.type='triangle';o.frequency.value=f/2;
  g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.08);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.05)}
 function song(key,out,t0){const S=SONGS[key],b=60/S.bpm;let t=t0,acc=0;
- S.n.split(',').forEach(x=>{const [n,d]=x.trim().split(' ');const dur=parseFloat(d)*b;bell(out,t,mf(n),dur);
+ S.n.split(',').forEach(x=>{const [n,d]=x.trim().split(' ');const dur=parseFloat(d)*b;bell(out,t,mf(n)*(S.box?2:1),dur);
   if(acc%4===0)pad(out,t,mf(n),b*4*.9);acc+=parseFloat(d);t+=dur});return t-t0}
 function stopMusic(){clearTimeout(loopT);if(bus){const b=bus;try{b.gain.setTargetAtTime(0,actx.currentTime,.08)}catch(e){}setTimeout(()=>b.disconnect(),400);bus=null}}
 function playMusic(){stopMusic();if(!musicOn||!audio())return;bus=actx.createGain();bus.connect(master);const mine=bus;
@@ -312,14 +341,17 @@ document.getElementById('vid').onclick=async()=>{if(busy)return;busy=true;const 
   document.getElementById('ovdl').style.display='block';document.getElementById('ovx').style.display='block';
   let ok=false;try{ok=!!(navigator.canShare&&navigator.canShare({files:[f]}))}catch(e){}
   if(ok&&ext==='mp4'){document.getElementById('ovtxt').innerHTML='¡Listo! Toca <b>Enviar</b> y elige WhatsApp.';const a=document.getElementById('ovdl');a.textContent='Enviar';a.removeAttribute('download');a.href='#';
-   a.onclick=async e=>{e.preventDefault();try{await navigator.share({files:[f]})}catch(er){}}}
+   a.onclick=async e=>{e.preventDefault();const v=document.getElementById('ovvid');v.pause();try{await navigator.share({files:[f]})}catch(er){}closeOv()}}
   else if(ext==='mp4'){document.getElementById('ovtxt').innerHTML='¡Listo! Toca <b>Descargar</b> y envíalo por WhatsApp.'}
   else{document.getElementById('ovtxt').innerHTML='Tu navegador crea el vídeo en un formato que WhatsApp no acepta.<br>Ábrela en <b>Chrome</b> o <b>Safari</b> actualizados para enviarlo, o usa <b>Foto por WhatsApp</b>.'}
  }catch(e){pr.style.display='none';document.getElementById('ovx').style.display='block';img.style.display='block';img.src=cv.toDataURL('image/png');
   document.getElementById('ovtxt').innerHTML='Este navegador no permite crear vídeo.<br>Envía la invitación como <b>foto</b> o ábrela en Chrome o Safari actualizados.'}
- busy=false;btn.textContent=old;if(started&&musicOn)playMusic()};
-document.getElementById('ovx').addEventListener('click',()=>{const v=document.getElementById('ovvid');v.pause();v.style.display='none';document.getElementById('ovimg').style.display='block';
- const a=document.getElementById('ovdl');a.textContent='Descargar';a.onclick=null;a.style.display='block'});
+ busy=false;btn.textContent=old};
+document.getElementById('ovvid').addEventListener('play',stopMusic);
+function closeOv(){document.getElementById('ov').classList.remove('show');const v=document.getElementById('ovvid');v.pause();if(started&&musicOn)playMusic();v.style.display='none';document.getElementById('ovimg').style.display='block';
+ const a=document.getElementById('ovdl');a.textContent='Descargar';a.onclick=null;a.style.display='block'}
+document.getElementById('ovx').addEventListener('click',closeOv);
+document.getElementById('ovdl').addEventListener('click',()=>{if(document.getElementById('ovdl').textContent==='Descargar')setTimeout(closeOv,1200)});
 
 buildTabs();buildForm();setUnlock();render();
 document.fonts.ready.then(render);
