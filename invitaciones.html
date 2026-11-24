@@ -16,7 +16,7 @@ button{font-family:inherit}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--txt);font-family:ODSans,system-ui,sans-serif}
 .wrap{max-width:560px;margin:0 auto;padding:18px 16px 120px}
-header{text-align:center;padding:6px 0 14px}
+header{text-align:center;padding:6px 46px 14px}
 header .k{font-size:11px;letter-spacing:.35em;color:var(--gold)}
 header h1{font-family:ODSerif,serif;font-weight:500;font-size:34px;margin:4px 0 0;color:var(--gold2)}
 .tabs{display:flex;flex-wrap:wrap;justify-content:center;gap:8px;padding:4px 0 12px}
@@ -55,11 +55,18 @@ footer{text-align:center;font-size:11px;letter-spacing:.3em;color:var(--gold);ma
 @media(min-width:900px){.wrap{max-width:1100px;display:grid;grid-template-columns:1fr 440px;column-gap:36px;align-items:start}
  header,.tabs{grid-column:1/-1}.prev{grid-row:3/7;grid-column:1;top:20px}.prev canvas{max-height:calc(100vh - 140px)}
  .unlock,.form,footer{grid-column:2}.unlock{margin-top:0}.bar{left:auto;right:calc(50% - 550px);width:440px;padding-left:0;padding-right:0;background:none}}
+.bar{flex-wrap:wrap}.btn.vid{flex-basis:100%;max-width:550px;background:linear-gradient(135deg,#8c6d33,#e9d7a8 45%,#c9a868 70%,#8c6d33);color:#140f07;font-weight:600}
+.wrap{padding-bottom:200px}
+.snd{position:fixed;top:12px;right:12px;z-index:8;width:46px;height:46px;border-radius:50%;border:1px solid var(--gold);background:rgba(23,20,15,.9);color:var(--gold2);font-size:20px;cursor:pointer}
+.prog{width:100%;max-width:420px;height:8px;background:#2a241b;border-radius:8px;overflow:hidden;margin:10px 0}.prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,#8c6d33,#e9d7a8)}
+.ov video{max-width:100%;max-height:62vh;border-radius:10px;border:1px solid var(--gold)}
+@media(min-width:900px){.bar{right:calc(50% - 550px)}.btn.vid{max-width:none}}
 </style>
 </head>
 <body>
 <div class="toast" id="toast"></div>
-<div class="ov" id="ov"><img id="ovimg" alt="Tu invitación"><p id="ovtxt">Mantén pulsada la imagen y elige <b>Guardar</b> o <b>Compartir</b>.</p><div class="row"><a id="ovdl" download>Descargar</a><button id="ovx">Cerrar</button></div></div>
+<button class="snd" id="snd" aria-label="Música">🔊</button>
+<div class="ov" id="ov"><img id="ovimg" alt="Tu invitación"><video id="ovvid" playsinline controls loop style="display:none"></video><div class="prog" id="prog" style="display:none"><i id="progi"></i></div><p id="ovtxt">Mantén pulsada la imagen y elige <b>Guardar</b> o <b>Compartir</b>.</p><div class="row"><a id="ovdl" download>Descargar</a><button id="ovx">Cerrar</button></div></div>
 <div class="wrap">
   <header><div class="k">ORDEN DORADO</div><h1>Invitaciones Doradas</h1></header>
   <div class="tabs" id="tabs"></div>
@@ -74,7 +81,8 @@ footer{text-align:center;font-size:11px;letter-spacing:.3em;color:var(--gold);ma
   <footer>O R D E N &nbsp; D O R A D O</footer>
 </div>
 <div class="bar">
-  <button class="btn wa" id="share"><span class="lg">Enviar por </span>WhatsApp</button>
+  <button class="btn vid" id="vid">🎬 Enviar como vídeo con música</button>
+  <button class="btn wa" id="share"><span class="lg">Foto por </span>WhatsApp</button>
   <button class="btn dl" id="dl">Descargar<span class="lg"> imagen</span></button>
 </div>
 
@@ -206,7 +214,7 @@ function render(){ctx.clearRect(0,0,W,H);DRAW[cur](data[cur]);if(!unlocked)water
 /* ---------- UI ---------- */
 const tabs=document.getElementById('tabs'),form=document.getElementById('form');
 function buildTabs(){tabs.innerHTML='';for(const k in T){const b=document.createElement('button');b.className='tab'+(k===cur?' on':'');b.textContent=T[k].tab;
- b.onclick=()=>{cur=k;buildTabs();buildForm();render()};tabs.appendChild(b)}}
+ b.onclick=()=>{cur=k;buildTabs();buildForm();render();if(started&&musicOn)playMusic()};tabs.appendChild(b)}}
 function buildForm(){form.innerHTML='';
  T[cur].f.forEach(([id,lab])=>{const l=document.createElement('label');l.textContent=lab;form.appendChild(l);
   const long=id==='msg'||id==='place';const el=document.createElement(long?'textarea':'input');if(!long)el.type='text';
@@ -222,7 +230,7 @@ document.getElementById('go').onclick=()=>{const c=document.getElementById('code
  if(CODES.includes(c)){unlocked=true;try{localStorage.setItem('od_inv_ok','1')}catch(e){}setUnlock();render();toast('¡Activada!')}else toast('Código no válido')};
 function blob(){return new Promise(r=>cv.toBlob(r,'image/png'))}
 const touch=matchMedia('(pointer:coarse)').matches;
-function showOverlay(b,msg){const u=URL.createObjectURL(b);const i=document.getElementById('ovimg');i.src=u;
+function showOverlay(b,msg){const u=URL.createObjectURL(b);const i=document.getElementById('ovimg');i.src=u;i.style.display='block';const vv=document.getElementById('ovvid');vv.pause();vv.style.display='none';document.getElementById('prog').style.display='none';document.getElementById('ovx').style.display='block';const a0=document.getElementById('ovdl');a0.style.display='block';a0.textContent='Descargar';a0.onclick=null;
  const a=document.getElementById('ovdl');a.href=u;a.download=T[cur].file+'.png';
  document.getElementById('ovtxt').innerHTML=msg;document.getElementById('ov').classList.add('show')}
 document.getElementById('ovx').onclick=()=>document.getElementById('ov').classList.remove('show');
@@ -235,6 +243,84 @@ document.getElementById('share').onclick=async()=>{const b=await blob();const f=
  if(ok){try{await navigator.share({files:[f]});return}catch(e){if(e&&e.name==='AbortError')return}}
  if(touch)showOverlay(b,'Mantén pulsada la imagen y elige <b>Compartir</b> › <b>WhatsApp</b>.<br>O guárdala y envíala desde WhatsApp.');
  else{directDownload(b);toast('Descargada: adjúntala en WhatsApp Web');window.open('https://web.whatsapp.com/','_blank')}};
+
+/* ================= MUSIC (public-domain melodies, synthesized bells) ================= */
+const NOTE={C:0,D:2,E:4,F:5,G:7,A:9,B:11};
+function mf(n){const m=n.match(/^([A-G])(#?)(\d)$/);const midi=12*(+m[3]+1)+NOTE[m[1]]+(m[2]?1:0);return 440*Math.pow(2,(midi-69)/12)}
+const SONGS={
+ navidad:{bpm:150,n:'E4 1,E4 1,E4 2,E4 1,E4 1,E4 2,E4 1,G4 1,C4 1.5,D4 .5,E4 4,F4 1,F4 1,F4 1.5,F4 .5,F4 1,E4 1,E4 1,E4 .5,E4 .5,E4 1,D4 1,D4 1,E4 1,D4 2,G4 2'},
+ fin:{bpm:120,n:'G4 1,C5 1.5,C5 .5,C5 1,E5 1,D5 1.5,C5 .5,D5 1,E5 1,C5 1.5,C5 .5,E5 1,G5 1,A5 3,A5 1,G5 1.5,E5 .5,E5 1,C5 1,D5 1.5,C5 .5,D5 1,E5 1,C5 1.5,A4 .5,A4 1,G4 1,C5 4'},
+ cumple:{bpm:120,n:'G4 .75,G4 .25,A4 1,G4 1,C5 1,B4 2,G4 .75,G4 .25,A4 1,G4 1,D5 1,C5 2,G4 .75,G4 .25,G5 1,E5 1,C5 1,B4 1,A4 2,F5 .75,F5 .25,E5 1,C5 1,D5 1,C5 3'},
+ boda:{bpm:72,n:'G4 1,C5 .75,C5 .25,C5 2,G4 1,D5 .75,B4 .25,C5 2,G4 1,C5 .75,F5 .25,F5 1,E5 .75,D5 .25,C5 1,B4 .75,C5 .25,D5 3'},
+};
+let actx=null,master=null,bus=null,loopT=null,musicOn=true,started=false;
+try{musicOn=localStorage.getItem('od_inv_music')!=='0'}catch(e){}
+function audio(){if(!actx){const AC=window.AudioContext||window.webkitAudioContext;if(!AC)return null;actx=new AC();master=actx.createGain();master.gain.value=.22;master.connect(actx.destination)}
+ if(actx.state==='suspended')actx.resume();return actx}
+function bell(out,t,f,dur){const g=actx.createGain();g.connect(out);
+ [[1,1],[2.01,.32],[3.02,.12],[4.1,.05]].forEach(([m,a])=>{const o=actx.createOscillator();o.type='sine';o.frequency.value=f*m;const og=actx.createGain();
+  og.gain.setValueAtTime(0,t);og.gain.linearRampToValueAtTime(a,t+.006);og.gain.exponentialRampToValueAtTime(.0008,t+Math.max(.5,dur*1.7));o.connect(og);og.connect(g);o.start(t);o.stop(t+Math.max(.6,dur*1.8))})}
+function pad(out,t,f,dur){const o=actx.createOscillator(),g=actx.createGain();o.type='triangle';o.frequency.value=f/2;
+ g.gain.setValueAtTime(0,t);g.gain.linearRampToValueAtTime(.12,t+.08);g.gain.exponentialRampToValueAtTime(.001,t+dur);o.connect(g);g.connect(out);o.start(t);o.stop(t+dur+.05)}
+function song(key,out,t0){const S=SONGS[key],b=60/S.bpm;let t=t0,acc=0;
+ S.n.split(',').forEach(x=>{const [n,d]=x.trim().split(' ');const dur=parseFloat(d)*b;bell(out,t,mf(n),dur);
+  if(acc%4===0)pad(out,t,mf(n),b*4*.9);acc+=parseFloat(d);t+=dur});return t-t0}
+function stopMusic(){clearTimeout(loopT);if(bus){const b=bus;try{b.gain.setTargetAtTime(0,actx.currentTime,.08)}catch(e){}setTimeout(()=>b.disconnect(),400);bus=null}}
+function playMusic(){stopMusic();if(!musicOn||!audio())return;bus=actx.createGain();bus.connect(master);const mine=bus;
+ const loop=()=>{if(bus!==mine)return;const len=song(cur,mine,actx.currentTime+.08);loopT=setTimeout(loop,(len+1.2)*1000)};loop()}
+const sndBtn=document.getElementById('snd');
+function paintSnd(){sndBtn.textContent=musicOn?'🔊':'🔇'}paintSnd();
+sndBtn.onclick=e=>{e.stopPropagation();musicOn=!musicOn;try{localStorage.setItem('od_inv_music',musicOn?'1':'0')}catch(e){}paintSnd();started=true;musicOn?playMusic():stopMusic()};
+function firstTouch(){if(started)return;started=true;if(musicOn)playMusic()}
+['pointerdown','touchend','click','keydown'].forEach(ev=>document.addEventListener(ev,firstTouch,{passive:true}));
+document.addEventListener('visibilitychange',()=>{if(document.hidden)stopMusic();else if(started&&musicOn)playMusic()});
+
+/* ================= VIDEO WITH MUSIC ================= */
+function pickMime(){if(!window.MediaRecorder)return null;const ok=m=>{try{return MediaRecorder.isTypeSupported(m)}catch(e){return false}};
+ const h264=['video/mp4;codecs="avc1.42E01E, mp4a.40.2"','video/mp4;codecs=avc1.42E01E,mp4a.40.2','video/mp4;codecs=avc1,mp4a.40.2','video/mp4;codecs="avc1.640028, mp4a.40.2"','video/mp4;codecs=avc1.640028,mp4a.40.2','video/mp4;codecs=avc1'];
+ for(const m of h264)if(ok(m))return m;
+ const safari=/Safari/.test(navigator.userAgent)&&!/Chrome|CriOS|Android|FxiOS|EdgiOS/.test(navigator.userAgent);
+ if(safari&&ok('video/mp4'))return 'video/mp4';   // Safari records H.264/AAC by default
+ for(const m of ['video/webm;codecs=vp9,opus','video/webm;codecs=vp8,opus','video/webm'])if(ok(m))return m;return null}
+async function makeVideo(onProg){const mime=pickMime();if(!mime||!audio()||!HTMLCanvasElement.prototype.captureStream)throw new Error('nosupport');
+ render();const base=document.createElement('canvas');base.width=W;base.height=H;base.getContext('2d').drawImage(cv,0,0);
+ const VW=720,VH=900,vc=document.createElement('canvas');vc.width=VW;vc.height=VH;const v=vc.getContext('2d');
+ const dest=actx.createMediaStreamDestination();const rb=actx.createGain();rb.gain.value=.5;rb.connect(dest);
+ const dur=Math.min(18,Math.max(9,song(cur,rb,actx.currentTime+.25)+1.2));
+ const stream=vc.captureStream(30);dest.stream.getAudioTracks().forEach(tr=>stream.addTrack(tr));
+ const rec=new MediaRecorder(stream,{mimeType:mime,videoBitsPerSecond:4000000});const chunks=[];rec.ondataavailable=e=>e.data.size&&chunks.push(e.data);
+ const R=rnd(42),stars=[...Array(36)].map(()=>[R()*VW,R()*VH,1+R()*2.5,R()*6]);
+ const t0=performance.now();let done=false;
+ function frame(){const t=(performance.now()-t0)/1000;if(t>dur){done=true;return}
+  const z=1.04-.04*Math.min(1,t/dur);const w=VW*z,h=VH*z;v.drawImage(base,(VW-w)/2,(VH-h)/2,w,h);
+  const p=((t%4)/4)*(VW+VH)-VH*.5;const g=v.createLinearGradient(p,0,p+160,160);g.addColorStop(0,'rgba(255,230,170,0)');g.addColorStop(.5,'rgba(255,230,170,.22)');g.addColorStop(1,'rgba(255,230,170,0)');
+  v.save();v.globalCompositeOperation='lighter';v.fillStyle=g;v.fillRect(0,0,VW,VH);
+  stars.forEach(([x,y,r,ph])=>{const a=Math.max(0,Math.sin(t*2.2+ph));v.fillStyle=`rgba(255,241,201,${a*.9})`;v.beginPath();v.moveTo(x,y-r*3);v.lineTo(x+r*.6,y);v.lineTo(x,y+r*3);v.lineTo(x-r*.6,y);v.fill();v.beginPath();v.moveTo(x-r*3,y);v.lineTo(x,y+r*.6);v.lineTo(x+r*3,y);v.lineTo(x,y-r*.6);v.fill()});
+  v.restore();if(t<.5){v.fillStyle=`rgba(0,0,0,${1-t/.5})`;v.fillRect(0,0,VW,VH)}
+  onProg&&onProg(t/dur);requestAnimationFrame(frame)}
+ frame();rec.start(250);
+ await new Promise(r=>{const iv=setInterval(()=>{if(done){clearInterval(iv);r()}},100)});
+ await new Promise(r=>{rec.onstop=r;rec.stop()});rb.disconnect();
+ const type=mime.split(';')[0];return new Blob(chunks,{type})}
+let busy=false;
+document.getElementById('vid').onclick=async()=>{if(busy)return;busy=true;const btn=document.getElementById('vid');const old=btn.textContent;
+ const ov=document.getElementById('ov'),img=document.getElementById('ovimg'),vid=document.getElementById('ovvid'),pr=document.getElementById('prog'),pi=document.getElementById('progi');
+ img.style.display='none';vid.style.display='none';pr.style.display='block';pi.style.width='0';document.getElementById('ovdl').style.display='none';document.getElementById('ovx').style.display='none';
+ document.getElementById('ovtxt').innerHTML='Creando tu vídeo con música…<br><small>Tarda unos 10 segundos. No cierres la página.</small>';ov.classList.add('show');stopMusic();
+ try{const b=await makeVideo(f=>pi.style.width=Math.round(f*100)+'%');const ext=b.type.includes('mp4')?'mp4':'webm';const f=new File([b],T[cur].file+'.'+ext,{type:b.type});
+  pr.style.display='none';const u=URL.createObjectURL(b);vid.src=u;vid.style.display='block';document.getElementById('ovdl').href=u;document.getElementById('ovdl').download=f.name;
+  document.getElementById('ovdl').style.display='block';document.getElementById('ovx').style.display='block';
+  let ok=false;try{ok=!!(navigator.canShare&&navigator.canShare({files:[f]}))}catch(e){}
+  if(ok&&ext==='mp4'){document.getElementById('ovtxt').innerHTML='¡Listo! Toca <b>Enviar</b> y elige WhatsApp.';const a=document.getElementById('ovdl');a.textContent='Enviar';a.removeAttribute('download');a.href='#';
+   a.onclick=async e=>{e.preventDefault();try{await navigator.share({files:[f]})}catch(er){}}}
+  else if(ext==='mp4'){document.getElementById('ovtxt').innerHTML='¡Listo! Toca <b>Descargar</b> y envíalo por WhatsApp.'}
+  else{document.getElementById('ovtxt').innerHTML='Tu navegador crea el vídeo en un formato que WhatsApp no acepta.<br>Ábrela en <b>Chrome</b> o <b>Safari</b> actualizados para enviarlo, o usa <b>Foto por WhatsApp</b>.'}
+ }catch(e){pr.style.display='none';document.getElementById('ovx').style.display='block';img.style.display='block';img.src=cv.toDataURL('image/png');
+  document.getElementById('ovtxt').innerHTML='Este navegador no permite crear vídeo.<br>Envía la invitación como <b>foto</b> o ábrela en Chrome o Safari actualizados.'}
+ busy=false;btn.textContent=old;if(started&&musicOn)playMusic()};
+document.getElementById('ovx').addEventListener('click',()=>{const v=document.getElementById('ovvid');v.pause();v.style.display='none';document.getElementById('ovimg').style.display='block';
+ const a=document.getElementById('ovdl');a.textContent='Descargar';a.onclick=null;a.style.display='block'});
+
 buildTabs();buildForm();setUnlock();render();
 document.fonts.ready.then(render);
 Promise.all(['40px ODSerif','italic 40px ODSerif','300 40px ODSans','400 40px ODSans','500 40px ODSans'].map(f=>document.fonts.load(f))).then(render);
