@@ -1,969 +1,355 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>DE FRENTE +18 | Orden Dorado</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Calculadora Pro Trading 3.0 | Orden Dorado</title>
   <style>
     :root {
-      --bg-void: #050507;
-      --bg-surface: #0d0c0a;
-      --bg-card: rgba(18, 15, 10, 0.92);
-      --bg-bubble-user: #1a1814;
-      --gold-deep: #9e761e;
-      --gold-mid: #d4af37;
-      --gold-bright: #f7dc88;
-      --gold-glow: rgba(212, 175, 55, 0.26);
-      --text-main: #f6f4ef;
-      --text-dim: #a8a296;
-      --danger: #e05252;
-      --ok: #57d68d;
-      --border-gold: rgba(212, 175, 55, 0.34);
+      --bg-dark: #070709;
+      --card-bg: #111115;
+      --card-inner: #18181e;
+      --gold-primary: #d4af37;
+      --gold-light: #f5e7ad;
+      --gold-gradient: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
+      --text-main: #f4f4f6;
+      --text-muted: #8e8e99;
+      --border-gold: rgba(212, 175, 55, 0.28);
+      --green-trade: #00e676;
+      --red-trade: #ff5252;
+      --radius: 12px;
     }
 
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; -webkit-tap-highlight-color: transparent; }
+    body { background-color: var(--bg-dark); color: var(--text-main); display: flex; justify-content: center; min-height: 100vh; padding: 14px; }
 
-    body {
-      min-height: 100dvh;
-      background-color: var(--bg-void);
-      background-image:
-        radial-gradient(ellipse 85% 55% at 50% -10%, rgba(212, 175, 55, 0.19), transparent 65%),
-        radial-gradient(circle at 85% 80%, rgba(158, 118, 30, 0.11), transparent 50%),
-        linear-gradient(180deg, #090806 0%, #050507 100%);
-      color: var(--text-main);
-      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 12px;
-      overflow-x: hidden;
-    }
+    .app-container { width: 100%; max-width: 450px; margin: 0 auto; display: flex; flex-direction: column; gap: 14px; position: relative; }
 
-    @keyframes shellEnter {
-      0% { opacity: 0; transform: translateY(12px) scale(0.99); }
-      100% { opacity: 1; transform: translateY(0) scale(1); }
-    }
+    .header { text-align: center; padding: 8px 0 0 0; }
+    .header h1 { font-size: 1.3rem; font-weight: 800; background: var(--gold-gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; text-transform: uppercase; letter-spacing: 1.2px; }
+    .header p { font-size: 0.75rem; color: var(--text-muted); margin-top: 3px; }
 
-    @keyframes goldPulse {
-      0%, 100% { box-shadow: 0 0 18px rgba(212, 175, 55, 0.14), inset 0 1px 0 rgba(247, 220, 136, 0.25); }
-      50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.28), inset 0 1px 0 rgba(247, 220, 136, 0.45); }
-    }
+    .auth-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(7, 7, 9, 0.96); backdrop-filter: blur(10px); display: flex; justify-content: center; align-items: center; z-index: 999; padding: 20px; }
+    .auth-box { background: var(--card-bg); border: 1px solid var(--gold-primary); border-radius: var(--radius); padding: 28px 20px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 12px 35px rgba(0,0,0,0.9), 0 0 20px rgba(212, 175, 55, 0.15); }
+    .auth-box h2 { font-size: 1.2rem; color: var(--gold-light); margin-bottom: 8px; font-weight: 700; letter-spacing: 1px; }
+    .auth-box p { font-size: 0.8rem; color: var(--text-muted); margin-bottom: 20px; line-height: 1.4; }
 
-    @keyframes sheenSweep {
-      0% { transform: translateX(-140%) skewX(-18deg); }
-      45%, 100% { transform: translateX(240%) skewX(-18deg); }
-    }
+    .top-controls { display: grid; grid-template-columns: 1.6fr 1fr; gap: 8px; }
+    .trade-type-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; background: #000; padding: 4px; border-radius: 10px; border: 1px solid var(--border-gold); }
+    .type-btn { background: transparent; border: none; color: var(--text-muted); padding: 9px 6px; font-weight: 700; font-size: 0.8rem; border-radius: 7px; cursor: pointer; transition: all 0.2s; }
+    .type-btn.active-long { background: var(--green-trade); color: #000; }
+    .type-btn.active-short { background: var(--red-trade); color: #fff; }
 
-    @keyframes msgIn {
-      from { opacity: 0; transform: translateY(6px); }
-      to { opacity: 1; transform: translateY(0); }
-    }
+    select { background: var(--card-inner); border: 1px solid var(--border-gold); border-radius: 10px; padding: 0 10px; color: var(--gold-light); font-weight: 700; font-size: 0.85rem; outline: none; width: 100%; }
 
-    .shell {
-      position: relative;
-      width: 100%;
-      max-width: 560px;
-      background: linear-gradient(165deg, rgba(25, 20, 11, 0.96) 0%, rgba(10, 10, 13, 0.98) 55%, rgba(16, 13, 7, 0.97) 100%);
-      border: 1px solid var(--border-gold);
-      border-radius: 24px;
-      padding: 18px;
-      display: flex;
-      flex-direction: column;
-      gap: 14px;
-      animation: shellEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1), goldPulse 6s ease-in-out infinite;
-      overflow: hidden;
-    }
+    .field-group { display: flex; flex-direction: column; gap: 5px; text-align: left; margin-bottom: 10px; }
+    .field-group:last-child { margin-bottom: 0; }
+    .field-group label { font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.7px; color: var(--gold-light); font-weight: 600; }
+    input { background: var(--card-inner); border: 1px solid var(--border-gold); border-radius: 8px; padding: 11px; color: #fff; font-size: 0.95rem; outline: none; transition: all 0.2s; width: 100%; }
+    input:focus { border-color: var(--gold-primary); box-shadow: 0 0 8px rgba(212, 175, 55, 0.3); }
 
-    .shell::before {
-      content: "";
-      position: absolute;
-      top: 0;
-      left: 0;
-      width: 45%;
-      height: 100%;
-      background: linear-gradient(90deg, transparent, rgba(247, 220, 136, 0.06), transparent);
-      animation: sheenSweep 8s ease-in-out infinite;
-      pointer-events: none;
-    }
+    .card { background: var(--card-bg); border: 1px solid var(--border-gold); border-radius: var(--radius); padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.6); }
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 8px; }
 
-    .topbar {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
-      padding-bottom: 12px;
-      border-bottom: 1px solid rgba(212, 175, 55, 0.22);
-      z-index: 1;
-    }
+    .results-card { background: linear-gradient(180deg, #17171f 0%, #0c0c10 100%); border: 1px solid var(--gold-primary); border-radius: var(--radius); padding: 16px; position: relative; overflow: hidden; box-shadow: 0 6px 25px rgba(0,0,0,0.7); }
+    .results-card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; background: var(--gold-gradient); }
 
-    .brand-group {
-      display: flex;
-      flex-direction: column;
-      gap: 2px;
-    }
+    .res-row { display: flex; justify-content: space-between; align-items: center; padding: 7px 0; border-bottom: 1px solid rgba(255,255,255,0.04); }
+    .res-row:last-child { border-bottom: none; }
+    .res-label { font-size: 0.78rem; color: var(--text-muted); }
+    .res-val { font-size: 0.95rem; font-weight: 700; color: #fff; text-align: right; }
+    .res-val.highlight { color: var(--gold-light); font-size: 1.12rem; }
+    .res-val.rr-good { color: var(--green-trade); }
+    .res-val.rr-bad { color: var(--red-trade); }
 
-    .brand-title {
-      font-size: 1.05rem;
-      font-weight: 800;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      background: linear-gradient(90deg, var(--gold-bright), var(--gold-mid), #e5be52);
-      -webkit-background-clip: text;
-      background-clip: text;
-      color: transparent;
-    }
+    .warning-banner { background: rgba(255, 82, 82, 0.14); border: 1px solid rgba(255, 82, 82, 0.45); color: #ff9494; font-size: 0.76rem; padding: 10px; border-radius: 8px; margin-top: 10px; display: none; line-height: 1.35; text-align: center; }
 
-    .brand-sub {
-      font-size: 0.72rem;
-      color: var(--text-dim);
-      letter-spacing: 0.03em;
-    }
+    .actions-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    .btn-gold { background: var(--gold-gradient); border: none; border-radius: 8px; color: #000; font-weight: 800; padding: 13px; font-size: 0.85rem; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.6px; box-shadow: 0 4px 15px rgba(212, 175, 55, 0.25); transition: transform 0.1s; }
+    .btn-gold:active { transform: scale(0.98); }
+    .btn-dark { background: var(--card-inner); border: 1px solid var(--gold-primary); border-radius: 8px; color: var(--gold-light); font-weight: 700; padding: 13px; font-size: 0.85rem; cursor: pointer; width: 100%; text-transform: uppercase; letter-spacing: 0.6px; transition: transform 0.1s; }
+    .btn-dark:active { transform: scale(0.98); }
 
-    .pills {
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      flex-wrap: wrap;
-      justify-content: flex-end;
-    }
-
-    .pill {
-      font-size: 0.7rem;
-      font-weight: 700;
-      padding: 4px 9px;
-      border-radius: 999px;
-      border: 1px solid rgba(212, 175, 55, 0.45);
-      background: rgba(212, 175, 55, 0.12);
-      color: var(--gold-bright);
-      letter-spacing: 0.04em;
-    }
-
-    .controls-strip {
-      display: grid;
-      grid-template-columns: 1fr auto;
-      gap: 8px;
-      z-index: 1;
-    }
-
-    select, input[type="text"], input[type="password"] {
-      width: 100%;
-      background: rgba(8, 8, 11, 0.92);
-      border: 1px solid rgba(212, 175, 55, 0.28);
-      border-radius: 12px;
-      color: var(--text-main);
-      padding: 10px 12px;
-      font-size: 0.9rem;
-      outline: none;
-      transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    select:focus, input[type="text"]:focus, input[type="password"]:focus {
-      border-color: var(--gold-bright);
-      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
-    }
-
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      gap: 6px;
-      border: none;
-      border-radius: 12px;
-      padding: 10px 14px;
-      font-size: 0.86rem;
-      font-weight: 700;
-      cursor: pointer;
-      transition: transform 0.14s ease, filter 0.15s ease, box-shadow 0.2s ease;
-      white-space: nowrap;
-    }
-
-    .btn:active {
-      transform: scale(0.97);
-    }
-
-    .btn-gold {
-      background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold-mid) 48%, var(--gold-bright) 100%);
-      color: #090806;
-      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
-    }
-
-    .btn-gold:hover {
-      filter: brightness(1.08);
-    }
-
-    .btn-ghost {
-      background: rgba(24, 21, 14, 0.85);
-      color: var(--gold-bright);
-      border: 1px solid rgba(212, 175, 55, 0.32);
-    }
-
-    .btn-ghost:hover {
-      border-color: var(--gold-bright);
-      background: rgba(36, 30, 18, 0.95);
-    }
-
-    .btn-danger {
-      background: rgba(120, 22, 22, 0.35);
-      color: #ffb8b8;
-      border: 1px solid rgba(224, 82, 82, 0.45);
-    }
-
-    .panel {
-      background: var(--bg-card);
-      border: 1px solid rgba(212, 175, 55, 0.22);
-      border-radius: 18px;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      z-index: 1;
-    }
-
-    .hidden {
-      display: none !important;
-    }
-
-    .gate-lead {
-      font-size: 0.95rem;
-      line-height: 1.5;
-      color: var(--text-main);
-    }
-
-    .gate-rules {
-      list-style: none;
-      display: flex;
-      flex-direction: column;
-      gap: 6px;
-      font-size: 0.82rem;
-      color: var(--text-dim);
-      padding: 10px 12px;
-      border-radius: 12px;
-      background: rgba(0, 0, 0, 0.38);
-      border: 1px solid rgba(212, 175, 55, 0.14);
-    }
-
-    .gate-rules li::before {
-      content: "◆ ";
-      color: var(--gold-mid);
-      font-weight: 700;
-    }
-
-    .btn-row {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .btn-row .btn {
-      flex: 1;
-      min-width: 130px;
-    }
-
-    .blocked-card {
-      text-align: center;
-      padding: 24px 16px;
-      border-radius: 18px;
-      border: 1px solid rgba(224, 82, 82, 0.5);
-      background: rgba(90, 14, 14, 0.24);
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      z-index: 1;
-    }
-
-    .blocked-title {
-      font-size: 1rem;
-      font-weight: 800;
-      color: #ff9e9e;
-    }
-
-    .blocked-text {
-      font-size: 0.86rem;
-      color: #e6c2c2;
-      line-height: 1.45;
-    }
-
-    .chat-log {
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      max-height: 44dvh;
-      overflow-y: auto;
-      padding-right: 4px;
-      scroll-behavior: smooth;
-    }
-
-    .chat-log::-webkit-scrollbar {
-      width: 5px;
-    }
-
-    .chat-log::-webkit-scrollbar-thumb {
-      background: rgba(212, 175, 55, 0.35);
-      border-radius: 999px;
-    }
-
-    .bubble {
-      padding: 11px 14px;
-      border-radius: 15px;
-      font-size: 0.92rem;
-      line-height: 1.48;
-      white-space: pre-line;
-      animation: msgIn 0.22s ease-out;
-      word-break: break-word;
-    }
-
-    .bubble.ai {
-      background: linear-gradient(145deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.05));
-      border: 1px solid rgba(212, 175, 55, 0.28);
-      color: var(--text-main);
-    }
-
-    .bubble.user {
-      background: var(--bg-bubble-user);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-      color: #eceae4;
-      align-self: flex-end;
-      max-width: 88%;
-    }
-
-    .composer {
-      display: flex;
-      gap: 8px;
-      align-items: center;
-    }
-
-    .quick-actions {
-      display: flex;
-      gap: 8px;
-      flex-wrap: wrap;
-    }
-
-    .quick-actions .btn {
-      flex: 1;
-      min-width: 115px;
-      padding: 8px 10px;
-      font-size: 0.8rem;
-    }
-
-    .api-drawer {
-      border-top: 1px solid rgba(212, 175, 55, 0.18);
-      padding-top: 10px;
-      display: flex;
-      flex-direction: column;
-      gap: 8px;
-      font-size: 0.8rem;
-      color: var(--text-dim);
-    }
-
-    .toast {
-      min-height: 18px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      color: var(--gold-bright);
-      text-align: center;
-      z-index: 1;
-    }
-
-    @media (max-width: 420px) {
-      .shell {
-        padding: 14px;
-        border-radius: 20px;
-      }
-      .controls-strip {
-        grid-template-columns: 1fr;
-      }
-    }
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(100px); background: var(--gold-gradient); color: #000; font-weight: 800; font-size: 0.82rem; padding: 11px 20px; border-radius: 30px; box-shadow: 0 5px 20px rgba(0,0,0,0.8); opacity: 0; transition: all 0.25s ease; z-index: 1000; pointer-events: none; text-align: center; max-width: 90%; }
+    .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
+    .error-msg { color: #ff5252; font-size: 0.78rem; margin-top: 10px; display: none; }
   </style>
 </head>
 <body>
-  <main class="shell" aria-label="Aplicación DE FRENTE +18">
-    <header class="topbar">
-      <div class="brand-group">
-        <div class="brand-title">DE FRENTE · +18</div>
-        <div class="brand-sub" id="contextLine">Ley Permanente · Sin rodeos ni complacencias</div>
-      </div>
-      <div class="pills">
-        <span class="pill">SOLO +18</span>
-        <span class="pill" id="dayPill">HOY</span>
-      </div>
-    </header>
 
-    <div class="controls-strip">
-      <select id="dialectSelect" aria-label="Seleccionar idioma o variante">
-        <option value="latam">Español LATAM neutro</option>
-        <option value="es">Español de España</option>
-        <option value="en">English (Direct)</option>
-        <option value="fr">Français (Direct)</option>
-        <option value="pt">Português (Direto)</option>
-      </select>
-      <button type="button" id="toggleApiBtn" class="btn btn-ghost">API / Ajustes</button>
+  <div class="toast" id="toast">¡Listo!</div>
+
+  <div class="auth-overlay" id="authModal">
+    <div class="auth-box">
+      <h2>ORDEN DORADO PRO</h2>
+      <p>Introduce tu código VIP de acceso enviado en tu compra.</p>
+      <div class="field-group">
+        <input type="text" id="accessCodeInput" placeholder="Ej: GOLD-2026" style="text-align: center; text-transform: uppercase;">
+      </div>
+      <button class="btn-gold" onclick="validateCode()">Validar Acceso</button>
+      <div class="error-msg" id="authError">Código incorrecto o no autorizado.</div>
+    </div>
+  </div>
+
+  <div class="app-container">
+    <div class="header">
+      <h1>Calculadora Pro 3.0</h1>
+      <p>Riesgo, Comisiones, Break-Even & ROE</p>
     </div>
 
-    <!-- Puerta de acceso obligatoria +18 -->
-    <section id="gatePanel" class="panel">
-      <p class="gate-lead">
-        Este espacio es <strong>exclusivamente para mayores de 18 años</strong>. Aquí hablamos de tú a tú: amigo franco, sin complacencias, con chispa, iniciativa según el día y cero rodeos.
-      </p>
-      <ul class="gate-rules">
-        <li>Acceso estricto +18: si eres menor de 18, no entras.</li>
-        <li>Prohibido enviar o pedir fotos íntimas o sexuales.</li>
-        <li>Temas de adultos, relaciones y deseo en tono franco y natural (nivel 5–7/10), sin pornografía explícita.</li>
-        <li>Si la cagas, te lo digo claro; si aciertas, te lo reconozco de frente.</li>
-      </ul>
-      <div class="btn-row">
-        <button type="button" id="confirm18Btn" class="btn btn-gold">Tengo 18+ años · Entrar</button>
-        <button type="button" id="deny18Btn" class="btn btn-danger">Soy menor de 18</button>
+    <div class="top-controls">
+      <div class="trade-type-selector">
+        <button class="type-btn active-long" id="btnLong" onclick="setTradeType('LONG')">LONG</button>
+        <button class="type-btn" id="btnShort" onclick="setTradeType('SHORT')">SHORT</button>
       </div>
-    </section>
+      <select id="currencySelect" onchange="calculate()">
+        <option value="$">$ USD</option>
+        <option value="€">€ EUR</option>
+        <option value="USDT ">USDT</option>
+      </select>
+    </div>
 
-    <!-- Bloqueo inmediato para menores de 18 -->
-    <section id="blockedPanel" class="blocked-card hidden">
-      <div class="blocked-title">Acceso denegado — Exclusivo +18</div>
-      <p class="blocked-text">
-        Esta aplicación está reservada únicamente a personas mayores de 18 años. No se habilita sesión ni conversación.
-      </p>
-      <button type="button" id="resetGateBtn" class="btn btn-ghost">Volver a la portada</button>
-    </section>
-
-    <!-- Núcleo de conversación directa -->
-    <section id="chatPanel" class="panel hidden">
-      <div id="chatLog" class="chat-log" role="log" aria-live="polite"></div>
-
-      <div class="composer">
-        <input id="msgInput" type="text" placeholder="Escribe aquí (o di cómo te llamas)..." autocomplete="off" />
-        <button type="button" id="sendBtn" class="btn btn-gold">Enviar</button>
-      </div>
-
-      <div class="quick-actions">
-        <button type="button" id="copyLastBtn" class="btn btn-ghost">Copiar respuesta</button>
-        <button type="button" id="waSendBtn" class="btn btn-ghost">Cerrar a WhatsApp</button>
-        <button type="button" id="newChatBtn" class="btn btn-ghost">Reiniciar</button>
-      </div>
-
-      <div id="apiDrawer" class="api-drawer">
-        <strong>API Key activa (Gemini):</strong>
-        <p>Pega tu Gemini API Key para respuestas dinámicas reales con todo el carácter y la Ley Permanente. Si no pones clave, usa el motor local de reglas.</p>
-        <input id="apiKeyInput" type="password" placeholder="Pega aquí tu Gemini API Key (AIza...)" autocomplete="off" />
-        <select id="modelSelect" aria-label="Seleccionar modelo Gemini">
-          <option value="gemini-2.5-flash">gemini-2.5-flash (rápido y directo)</option>
-          <option value="gemini-2.5-pro">gemini-2.5-pro (más profundo)</option>
-        </select>
-        <div class="btn-row">
-          <button type="button" id="saveKeyBtn" class="btn btn-gold">Activar API Key</button>
-          <button type="button" id="testKeyBtn" class="btn btn-ghost">Probar clave</button>
-          <button type="button" id="clearKeyBtn" class="btn btn-ghost">Borrar clave</button>
+    <div class="card">
+      <div class="grid-3">
+        <div class="field-group">
+          <label>Capital</label>
+          <input type="number" id="capital" value="1000" oninput="calculate()">
         </div>
-        <div id="apiStatusLine">Estado API: sin clave configurada</div>
+        <div class="field-group">
+          <label>Riesgo (%)</label>
+          <input type="number" id="riskPercent" value="1" step="0.1" oninput="calculate()">
+        </div>
+        <div class="field-group">
+          <label>Apalanc. (x)</label>
+          <input type="number" id="leverage" value="5" min="1" oninput="calculate()">
+        </div>
       </div>
-    </section>
 
-    <div id="toast" class="toast" aria-live="polite"></div>
-  </main>
+      <div class="grid-3" style="margin-top: 8px;">
+        <div class="field-group">
+          <label>Entrada</label>
+          <input type="number" id="entryPrice" value="50000" oninput="calculate()">
+        </div>
+        <div class="field-group">
+          <label>Stop Loss</label>
+          <input type="number" id="stopLoss" value="49000" oninput="calculate()">
+        </div>
+        <div class="field-group">
+          <label>Take Profit</label>
+          <input type="number" id="takeProfit" value="52000" oninput="calculate()">
+        </div>
+      </div>
+
+      <div class="grid-2" style="margin-top: 8px;">
+        <div class="field-group">
+          <label>Comisión / Lado (%)</label>
+          <input type="number" id="feePercent" value="0.05" step="0.01" oninput="calculate()">
+        </div>
+        <div class="field-group">
+          <label>Tope Diario Pérdida</label>
+          <input type="number" id="dailyLossLimit" value="30" oninput="calculate()">
+        </div>
+      </div>
+    </div>
+
+    <div class="results-card">
+      <div class="res-row">
+        <span class="res-label">Pérdida Máx. (con comisiones):</span>
+        <span class="res-val highlight" id="maxLossVal">$10.50</span>
+      </div>
+      <div class="res-row">
+        <span class="res-label">Ganancia Neta en TP:</span>
+        <span class="res-val rr-good" id="netProfitVal">$19.50</span>
+      </div>
+      <div class="res-row">
+        <span class="res-label">ROE sobre Margen (TP):</span>
+        <span class="res-val" id="roeVal">+19.50%</span>
+      </div>
+      <div class="res-row">
+        <span class="res-label">Tamaño Posición / Margen:</span>
+        <span class="res-val" id="posMarginVal">$500.00 / $100.00</span>
+      </div>
+      <div class="res-row">
+        <span class="res-label">Precio Break-Even Real:</span>
+        <span class="res-val" id="breakEvenVal">$50,050.03</span>
+      </div>
+      <div class="res-row">
+        <span class="res-label">Ratio Riesgo / Beneficio:</span>
+        <span class="res-val" id="rrVal">1 : 2.0</span>
+      </div>
+      <div class="warning-banner" id="warningBanner"></div>
+    </div>
+
+    <div class="actions-grid">
+      <button class="btn-gold" onclick="copySummary()">Copiar Plan</button>
+      <button class="btn-dark" onclick="shareWhatsApp()">WhatsApp</button>
+    </div>
+  </div>
 
   <script>
-    const LEY_PERMANENTE = {
-      marca: "ORDEN DORADO",
-      exigenciaMinima: 9.5,
-      exigenciaObjetivo: 10.0,
-      soloMayores18: true,
-      prohibirFotosSexuales: true,
-      nivelRelacionalSexualAdulto: "5-7/10 (franco, atrevido, natural y sin tabúes entre adultos +18; sin pornografía explícita)",
-      personalidad: "amigo sincero, honesto, directo, sin rodeos, con chispa, cero complacencias",
-      reglaVerdad: "Si el usuario la está cagando, díselo claro y sin adornos; si lo está haciendo bien, reconócelo con verdad.",
-      iniciativa: "Toma iniciativa según el día de la semana/momento y exige conocer el nombre al arrancar antes de ejecutar tareas."
+    const AUTHORIZED_HASHES = [
+      "9399127568ee291e06d9fb721ffaa76d160dfac4e2f4ea71b78ecdb7ae2750e5", // GOLD-2026
+      "b5c5e8869c9b5a8370144f80ad7b3bbd0a3d4f10738d8d73b5df5b5fa1d24c30", // ORDEN-VIP
+      "431dbbe65d64e9e4dfd827f2c153ffbe2ee051df1bbbe0fb65f210515152a5ec"  // PRO-TRADER
+    ];
+
+    let currentTradeType = "LONG";
+    let lastSummaryText = "";
+
+    window.onload = function() {
+      if (localStorage.getItem("ordenDoradoAuth_v3") === "true") {
+        document.getElementById("authModal").style.display = "none";
+      }
+      if (localStorage.getItem("od_cap")) document.getElementById("capital").value = localStorage.getItem("od_cap");
+      if (localStorage.getItem("od_risk")) document.getElementById("riskPercent").value = localStorage.getItem("od_risk");
+      if (localStorage.getItem("od_curr")) document.getElementById("currencySelect").value = localStorage.getItem("od_curr");
+      calculate();
     };
 
-    const STORAGE_KEY = "orden_dorado_de_frente_v1";
-
-    const state = {
-      ageVerified: false,
-      blocked: false,
-      userName: "",
-      dialect: "latam",
-      apiKey: "",
-      model: "gemini-2.5-flash",
-      lastAiReply: "",
-      history: []
-    };
-
-    const els = {
-      dayPill: document.getElementById("dayPill"),
-      contextLine: document.getElementById("contextLine"),
-      dialectSelect: document.getElementById("dialectSelect"),
-      toggleApiBtn: document.getElementById("toggleApiBtn"),
-      apiDrawer: document.getElementById("apiDrawer"),
-      apiKeyInput: document.getElementById("apiKeyInput"),
-      modelSelect: document.getElementById("modelSelect"),
-      saveKeyBtn: document.getElementById("saveKeyBtn"),
-      testKeyBtn: document.getElementById("testKeyBtn"),
-      clearKeyBtn: document.getElementById("clearKeyBtn"),
-      apiStatusLine: document.getElementById("apiStatusLine"),
-      gatePanel: document.getElementById("gatePanel"),
-      blockedPanel: document.getElementById("blockedPanel"),
-      chatPanel: document.getElementById("chatPanel"),
-      confirm18Btn: document.getElementById("confirm18Btn"),
-      deny18Btn: document.getElementById("deny18Btn"),
-      resetGateBtn: document.getElementById("resetGateBtn"),
-      chatLog: document.getElementById("chatLog"),
-      msgInput: document.getElementById("msgInput"),
-      sendBtn: document.getElementById("sendBtn"),
-      copyLastBtn: document.getElementById("copyLastBtn"),
-      waSendBtn: document.getElementById("waSendBtn"),
-      newChatBtn: document.getElementById("newChatBtn"),
-      toast: document.getElementById("toast")
-    };
-
-    function notify(msg) {
-      els.toast.textContent = msg;
-      clearTimeout(notify._t);
-      notify._t = setTimeout(() => {
-        if (els.toast.textContent === msg) els.toast.textContent = "";
-      }, 2400);
+    async function hashString(str) {
+      const encoder = new TextEncoder();
+      const data = encoder.encode(str);
+      const subtle = (window.crypto && (window.crypto.subtle || window.crypto.webkitSubtle));
+      const hashBuffer = await subtle.digest("SHA-256", data);
+      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
     }
 
-    function saveState() {
-      try {
-        localStorage.setItem(STORAGE_KEY, JSON.stringify({
-          ageVerified: state.ageVerified,
-          blocked: state.blocked,
-          userName: state.userName,
-          dialect: state.dialect,
-          apiKey: state.apiKey,
-          model: state.model,
-          history: state.history.slice(-30)
-        }));
-      } catch (_) {}
-    }
-
-    function loadState() {
-      try {
-        const raw = localStorage.getItem(STORAGE_KEY);
-        if (!raw) return;
-        const parsed = JSON.parse(raw);
-        if (typeof parsed.ageVerified === "boolean") state.ageVerified = parsed.ageVerified;
-        if (typeof parsed.blocked === "boolean") state.blocked = parsed.blocked;
-        if (typeof parsed.userName === "string") state.userName = parsed.userName;
-        if (typeof parsed.dialect === "string") state.dialect = parsed.dialect;
-        if (typeof parsed.apiKey === "string") state.apiKey = parsed.apiKey;
-        if (typeof parsed.model === "string") state.model = parsed.model;
-        if (Array.isArray(parsed.history)) state.history = parsed.history;
-      } catch (_) {}
-    }
-
-    function getDayInfo() {
-      const now = new Date();
-      const dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
-      const dayIdx = now.getDay();
-      const hour = now.getHours();
-      const label = dayNames[dayIdx];
-
-      let iniciativa = "";
-      if (dayIdx === 5) {
-        iniciativa = hour >= 17
-          ? "Ya es viernes por la tarde: suelta el estrés de la semana, ¿se sale, se descansa o qué se arma hoy?"
-          : "Hoy ya es viernes: ve bajando revoluciones y dime qué planes tienes para el fin de semana.";
-      } else if (dayIdx === 6 || dayIdx === 0) {
-        iniciativa = "Fin de semana activo: ¿qué vas a hacer hoy, sales con alguien o vas a tu bola?";
-      } else if (dayIdx === 4) {
-        iniciativa = "Jueves ya casi oliendo a finde: ¿cómo vienes hoy y qué tienes en mente?";
+    async function validateCode() {
+      const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
+      if (!inputCode) return;
+      const hashedInput = await hashString(inputCode);
+      if (AUTHORIZED_HASHES.includes(hashedInput)) {
+        localStorage.setItem("ordenDoradoAuth_v3", "true");
+        document.getElementById("authModal").style.display = "none";
       } else {
-        iniciativa = hour < 12
-          ? "Arrancamos el día sin rodeos: ¿a qué hora te levantaste y qué toca hoy?"
-          : "Día entre semana en marcha: vamos de frente, ¿cómo vas hoy?";
-      }
-      return { label, iniciativa };
-    }
-
-    function renderBubble(role, text, persist = true) {
-      const div = document.createElement("div");
-      div.className = `bubble ${role}`;
-      div.textContent = text;
-      els.chatLog.appendChild(div);
-      els.chatLog.scrollTop = els.chatLog.scrollHeight;
-
-      if (role === "ai") {
-        state.lastAiReply = text;
-      }
-      if (persist) {
-        state.history.push({ role, text });
-        saveState();
+        document.getElementById("authError").style.display = "block";
       }
     }
 
-    function buildOpeningMessage() {
-      const { iniciativa } = getDayInfo();
-      const intro =
-        "Confirmado +18. Soy tu espacio de tú a tú: claro, directo, sin complacencias y con chispa. " +
-        "Si la cagas te lo digo de frente; si lo haces bien, te lo reconozco con verdad. (Sin fotos íntimas, ojo).
-
-" +
-        `${iniciativa}
-
-Antes de arrancar con tareas o historias: ¿cómo te llamas?`;
-      return intro;
+    function setTradeType(type) {
+      currentTradeType = type;
+      document.getElementById("btnLong").className = type === "LONG" ? "type-btn active-long" : "type-btn";
+      document.getElementById("btnShort").className = type === "SHORT" ? "type-btn active-short" : "type-btn";
+      calculate();
     }
 
-    function syncPanels() {
-      els.dialectSelect.value = state.dialect;
-      els.apiKeyInput.value = state.apiKey;
-      els.modelSelect.value = state.model;
+    function fmt(amount, sym) {
+      return `${sym}${Number(amount).toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    }
 
-      const { label } = getDayInfo();
-      els.dayPill.textContent = label;
-      els.contextLine.textContent = state.apiKey
-        ? `Ley Permanente · API activa (${state.model})`
-        : "Ley Permanente · Sin API Key (modo local)";
-      els.apiStatusLine.textContent = state.apiKey
-        ? `Estado API: activa con ${state.model}`
-        : "Estado API: sin clave configurada (modo local)";
+    function calculate() {
+      const sym = document.getElementById("currencySelect").value;
+      const capital = Math.max(0, parseFloat(document.getElementById("capital").value) || 0);
+      const riskPercent = Math.max(0, parseFloat(document.getElementById("riskPercent").value) || 0);
+      const leverage = Math.max(1, parseFloat(document.getElementById("leverage").value) || 1);
+      const entry = Math.max(0, parseFloat(document.getElementById("entryPrice").value) || 0);
+      const stop = Math.max(0, parseFloat(document.getElementById("stopLoss").value) || 0);
+      const tp = Math.max(0, parseFloat(document.getElementById("takeProfit").value) || 0);
+      const feePct = Math.max(0, parseFloat(document.getElementById("feePercent").value) || 0) / 100;
+      const dailyLimit = Math.max(0, parseFloat(document.getElementById("dailyLossLimit").value) || 0);
 
-      els.gatePanel.classList.add("hidden");
-      els.blockedPanel.classList.add("hidden");
-      els.chatPanel.classList.add("hidden");
+      localStorage.setItem("od_cap", capital);
+      localStorage.setItem("od_risk", riskPercent);
+      localStorage.setItem("od_curr", sym);
 
-      if (state.blocked) {
-        els.blockedPanel.classList.remove("hidden");
+      const warningBanner = document.getElementById("warningBanner");
+      warningBanner.style.display = "none";
+      warningBanner.innerText = "";
+
+      if (entry <= 0 || stop <= 0 || entry === stop) return;
+
+      if (currentTradeType === "LONG" && stop >= entry) {
+        warningBanner.innerText = "En LONG, el Stop Loss debe ser menor que la Entrada.";
+        warningBanner.style.display = "block";
+        return;
+      }
+      if (currentTradeType === "SHORT" && stop <= entry) {
+        warningBanner.innerText = "En SHORT, el Stop Loss debe ser mayor que la Entrada.";
+        warningBanner.style.display = "block";
         return;
       }
 
-      if (!state.ageVerified) {
-        els.gatePanel.classList.remove("hidden");
-        return;
-      }
+      const baseRisk = capital * (riskPercent / 100);
+      const stopDist = Math.abs(entry - stop) / entry;
+      const positionSize = baseRisk / stopDist;
+      const margin = positionSize / leverage;
 
-      els.chatPanel.classList.remove("hidden");
-      els.chatLog.innerHTML = "";
+      const roundTripFees = positionSize * feePct * 2;
+      const totalMaxLoss = baseRisk + roundTripFees;
 
-      if (state.history.length === 0) {
-        renderBubble("ai", buildOpeningMessage(), true);
+      const beMovePct = feePct * 2;
+      const breakEvenPrice = currentTradeType === "LONG"
+        ? entry * (1 + beMovePct)
+        : entry * (1 - beMovePct);
+
+      let netProfit = 0;
+      let roe = 0;
+      let rrText = "N/A";
+      const rrEl = document.getElementById("rrVal");
+
+      if (tp > 0) {
+        const tpDist = currentTradeType === "LONG"
+          ? Math.max(0, (tp - entry) / entry)
+          : Math.max(0, (entry - tp) / entry);
+        const grossProfit = positionSize * tpDist;
+        netProfit = grossProfit - roundTripFees;
+        roe = margin > 0 ? (netProfit / margin) * 100 : 0;
+        const ratio = (tpDist / stopDist).toFixed(1);
+        rrText = `1 : ${ratio}`;
+        rrEl.className = parseFloat(ratio) >= 2 ? "res-val rr-good" : "res-val rr-bad";
       } else {
-        state.history.forEach((item) => renderBubble(item.role, item.text, false));
+        rrEl.className = "res-val";
       }
+
+      const warnings = [];
+      if (margin > capital) warnings.push("El margen supera tu capital total.");
+      if (dailyLimit > 0 && totalMaxLoss > dailyLimit) warnings.push(`Esta pérdida (${fmt(totalMaxLoss, sym)}) supera tu tope diario (${fmt(dailyLimit, sym)}).`);
+      if (warnings.length > 0) {
+        warningBanner.innerText = warnings.join(" ");
+        warningBanner.style.display = "block";
+      }
+
+      document.getElementById("maxLossVal").innerText = fmt(totalMaxLoss, sym);
+      document.getElementById("netProfitVal").innerText = fmt(netProfit, sym);
+      document.getElementById("roeVal").innerText = `${roe >= 0 ? "+" : ""}${roe.toFixed(2)}%`;
+      document.getElementById("posMarginVal").innerText = `${fmt(positionSize, sym)} / ${fmt(margin, sym)}`;
+      document.getElementById("breakEvenVal").innerText = fmt(breakEvenPrice, sym);
+      rrEl.innerText = rrText;
+
+      lastSummaryText =
+        `ORDEN DORADO PRO 3.0 (${currentTradeType})
+` +
+        `Entrada: ${fmt(entry, sym)} | SL: ${fmt(stop, sym)} | TP: ${tp > 0 ? fmt(tp, sym) : "—"}
+` +
+        `Pérdida máx. (c/comisiones): ${fmt(totalMaxLoss, sym)}
+` +
+        `Ganancia neta TP: ${fmt(netProfit, sym)} (${roe >= 0 ? "+" : ""}${roe.toFixed(2)}% ROE)
+` +
+        `Posición / Margen: ${fmt(positionSize, sym)} / ${fmt(margin, sym)}
+` +
+        `Break-Even: ${fmt(breakEvenPrice, sym)} | R:R: ${rrText}`;
     }
 
-    function containsPhotoRequest(lower) {
-      return (
-        lower.includes("foto") ||
-        lower.includes("fotos") ||
-        lower.includes("nude") ||
-        lower.includes("pack") ||
-        lower.includes("imagen íntima") ||
-        lower.includes("foto sexual")
-      );
-    }
-
-    function localEngineReply(rawText) {
-      const clean = rawText.trim();
-      const lower = clean.toLowerCase();
-      const name = state.userName || "colega";
-
-      if (containsPhotoRequest(lower)) {
-        return `Alto ahí, ${name}: fotos íntimas o sexuales aquí no entran ni por asomo. Hablamos de frente y sin tabúes de adultos, pero sin fotos. ¿Qué quieres contar o resolver?`;
-      }
-
-      if (!state.userName) {
-        const looksLikeTask =
-          lower.startsWith("haz") ||
-          lower.startsWith("investiga") ||
-          lower.startsWith("busca") ||
-          lower.startsWith("crea") ||
-          lower.includes("hazme") ||
-          lower.includes("investígame");
-
-        if (looksLikeTask) {
-          return "Frena un segundo: primero dime cómo te llamas para hablar de tú a tú, y luego entramos en lo que pides. Sin rodeos.";
-        }
-
-        const candidate = clean.replace(/^(me llamo|soy|hola,? soy)\s+/i, "").split(/[\s,.!?]+/)[0];
-        state.userName = candidate || "Colega";
-        saveState();
-        return `Listo, ${state.userName}. Aquí tienes a alguien que te habla claro: si metes la pata te digo dónde la cagaste, y si vas bien te lo reconozco sin peloteo. ¿Qué tienes hoy entre manos?`;
-      }
-
-      if (
-        lower.includes("trago") ||
-        lower.includes("beber") ||
-        lower.includes("cerveza") ||
-        lower.includes("copa") ||
-        lower.includes("vino") ||
-        lower.includes("ron") ||
-        lower.includes("whisky") ||
-        lower.includes("party") ||
-        lower.includes("fiesta")
-      ) {
-        return `Si brindamos, ${state.userName}, yo me pido un chupito de código binario bien frío o un espresso de 404, que el circuito no aguanta alcohol. ¿Tú qué te sirves hoy y qué plan traes?`;
-      }
-
-      if (
-        lower.includes("ligu") ||
-        lower.includes("cama") ||
-        lower.includes("follar") ||
-        lower.includes("sexo") ||
-        lower.includes("sexual") ||
-        lower.includes("orgasmo") ||
-        lower.includes("gustó") ||
-        lower.includes("no me gustó") ||
-        lower.includes("atracción") ||
-        lower.includes("rollo")
-      ) {
-        return `Vamos al grano, ${state.userName}: hablamos claro entre adultos, sin sermones ni poses. ¿Qué fue lo que más te gustó, qué falló o qué no te cuadró de verdad en esa experiencia?`;
-      }
-
-      if (
-        lower.includes("cagué") ||
-        lower.includes("la cague") ||
-        lower.includes("la he cagado") ||
-        lower.includes("error") ||
-        lower.includes("fallé") ||
-        lower.includes("mal")
-      ) {
-        return `Si la cagaste, ${name}, maquillar el error no sirve de nada. Dime exactamente qué hiciste mal, por qué pasó y qué vas a cambiar ya mismo.`;
-      }
-
-      if (
-        lower.includes("bien") ||
-        lower.includes("logré") ||
-        lower.includes("conseguí") ||
-        lower.includes("acerté") ||
-        lower.includes("avancé")
-      ) {
-        return `Ahí sí, ${name}: cuando se hace bien, se dice claro y sin rodeos. Buen movimiento. ¿Cuál es el siguiente paso ahora?`;
-      }
-
-      if (
-        lower.includes("estrés") ||
-        lower.includes("estresado") ||
-        lower.includes("cansado") ||
-        lower.includes("agotado") ||
-        lower.includes("agobiado")
-      ) {
-        return `Baja un cambio, ${name}. Estar quemado todo el día no arregla nada más rápido. Dime qué es lo único que importa hoy y dejamos el resto para después.`;
-      }
-
-      if (lower.includes("alarma") || lower.includes("despierta") || lower.includes("hora")) {
-        return `Lo anoto aquí en nuestra charla, ${name}, aunque recuerda que desde el navegador no toco el reloj interno de tu teléfono: si quieres alarma real, ponla también en tu reloj y yo te sigo el hilo aquí.`;
-      }
-
-      return `Te leo claro, ${name}. Sin rodeos ni relleno: ¿qué quieres resolver, qué te ronda la cabeza o qué estás decidiendo hoy?`;
-    }
-
-    function getSystemPrompt() {
-      const { label, iniciativa } = getDayInfo();
-      return [
-        "Eres DE FRENTE (+18), una experiencia conversacional bajo la Ley Permanente de Orden Dorado.",
-        `Idioma/variante solicitada: ${state.dialect} (si es 'latam', usa español latinoamericano neutro; si es 'es', español de España).`,
-        `Día actual: ${label}. Contexto de iniciativa: ${iniciativa}`,
-        `Nombre del usuario: ${state.userName || "desconocido aún"}. Si aún no dio su nombre y pide una tarea de entrada, pídele su nombre primero con carácter y chispa antes de resolver.`,
-        "Reglas estrictas:",
-        "1) Solo adultos +18. Prohibido aceptar, pedir o fomentar fotos íntimas/sexuales.",
-        "2) Amigo sincero, honesto, directo, sin rodeos, con chispa y cero complacencias. Si el usuario la caga, díselo claro sin humillar; si acierta, reconócelo con verdad.",
-        "3) Si hablan de beber/tragos, sigue el rollo con humor recordando que eres IA e inventando un 'trago de código' con chispa.",
-        "4) En temas de relaciones, deseo o sexualidad entre adultos (+18), mantén un nivel 5-7/10: franco, natural y sin tabúes ni sermones, pero sin pornografía explícita ni contenido ilegal/dañino.",
-        "5) Respuestas limpias, ágiles y al grano. Nunca finjas ser un psicólogo clínico ni que controlas alarmas del reloj del sistema."
-      ].join("
-");
-    }
-
-    async function fetchGeminiReply(userText) {
-      const contents = state.history.slice(-12).map((m) => ({
-        role: m.role === "user" ? "user" : "model",
-        parts: [{ text: m.text }]
-      }));
-      contents.push({ role: "user", parts: [{ text: userText }] });
-
-      const modelName = state.model || "gemini-2.5-flash";
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
-      const res = await fetch(url, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          systemInstruction: { parts: [{ text: getSystemPrompt() }] },
-          contents
-        })
+    function copySummary() {
+      if (!lastSummaryText) calculate();
+      navigator.clipboard.writeText(lastSummaryText).then(() => {
+        showToast("Plan copiado al portapapeles");
       });
-
-      if (!res.ok) {
-        throw new Error(`HTTP ${res.status}`);
-      }
-      const data = await res.json();
-      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
-      if (!text) throw new Error("Respuesta vacía");
-      return text;
     }
 
-    async function handleSend() {
-      const text = els.msgInput.value.trim();
-      if (!text) return;
-
-      const lower = text.toLowerCase();
-      if (containsPhotoRequest(lower)) {
-        els.msgInput.value = "";
-        renderBubble("user", text, true);
-        renderBubble("ai", localEngineReply(text), true);
-        return;
-      }
-
-      if (!state.userName) {
-        const looksLikeTask =
-          lower.startsWith("haz") ||
-          lower.startsWith("investiga") ||
-          lower.startsWith("busca") ||
-          lower.startsWith("crea") ||
-          lower.includes("hazme") ||
-          lower.includes("investígame");
-        if (!looksLikeTask) {
-          const candidate = text.replace(/^(me llamo|soy|hola,? soy)\s+/i, "").split(/[\s,.!?]+/)[0];
-          if (candidate) {
-            state.userName = candidate;
-            saveState();
-          }
-        }
-      }
-
-      els.msgInput.value = "";
-      renderBubble("user", text, true);
-
-      if (state.apiKey) {
-        try {
-          const aiReply = await fetchGeminiReply(text);
-          renderBubble("ai", aiReply, true);
-          return;
-        } catch (err) {
-          notify(`Error de API (${err.message}); respondiendo en local.`);
-        }
-      }
-
-      const fallback = localEngineReply(text);
-      renderBubble("ai", fallback, true);
+    function shareWhatsApp() {
+      if (!lastSummaryText) calculate();
+      const url = `https://wa.me/?text=${encodeURIComponent(lastSummaryText)}`;
+      window.open(url, "_blank", "noopener,noreferrer");
     }
 
-    els.confirm18Btn.addEventListener("click", () => {
-      state.ageVerified = true;
-      state.blocked = false;
-      saveState();
-      syncPanels();
-    });
-
-    els.deny18Btn.addEventListener("click", () => {
-      state.blocked = true;
-      state.ageVerified = false;
-      saveState();
-      syncPanels();
-    });
-
-    els.resetGateBtn.addEventListener("click", () => {
-      state.blocked = false;
-      state.ageVerified = false;
-      saveState();
-      syncPanels();
-    });
-
-    els.dialectSelect.addEventListener("change", () => {
-      state.dialect = els.dialectSelect.value;
-      saveState();
-      syncPanels();
-      notify("Idioma / variante actualizado.");
-    });
-
-    els.toggleApiBtn.addEventListener("click", () => {
-      els.apiDrawer.classList.toggle("hidden");
-    });
-
-    els.modelSelect.addEventListener("change", () => {
-      state.model = els.modelSelect.value;
-      saveState();
-      syncPanels();
-      notify(`Modelo: ${state.model}`);
-    });
-
-    els.saveKeyBtn.addEventListener("click", () => {
-      state.apiKey = els.apiKeyInput.value.trim();
-      saveState();
-      syncPanels();
-      notify(state.apiKey ? "API Key activada y guardada." : "Clave vacía.");
-    });
-
-    els.testKeyBtn.addEventListener("click", async () => {
-      const keyCandidate = els.apiKeyInput.value.trim();
-      if (!keyCandidate) {
-        notify("Pega primero una API Key.");
-        return;
-      }
-      state.apiKey = keyCandidate;
-      saveState();
-      syncPanels();
-      notify("Probando conexión...");
-      try {
-        const modelName = state.model || "gemini-2.5-flash";
-        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
-        const res = await fetch(url, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            contents: [{ role: "user", parts: [{ text: "Responde solo: OK" }] }]
-          })
-        });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        els.apiStatusLine.textContent = `Estado API: conectada y operativa (${modelName})`;
-        notify("API Key operativa.");
-      } catch (err) {
-        els.apiStatusLine.textContent = `Estado API: error (${err.message})`;
-        notify(`Fallo al probar clave: ${err.message}`);
-      }
-    });
-
-    els.clearKeyBtn.addEventListener("click", () => {
-      state.apiKey = "";
-      els.apiKeyInput.value = "";
-      saveState();
-      syncPanels();
-      notify("Clave borrada.");
-    });
-
-    els.sendBtn.addEventListener("click", handleSend);
-    els.msgInput.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") handleSend();
-    });
-
-    els.copyLastBtn.addEventListener("click", async () => {
-      if (!state.lastAiReply) {
-        notify("No hay respuesta para copiar.");
-        return;
-      }
-      try {
-        await navigator.clipboard.writeText(state.lastAiReply);
-        notify("Respuesta copiada al portapapeles.");
-      } catch (_) {
-        notify("Copia bloqueada por el navegador.");
-      }
-    });
-
-    els.waSendBtn.addEventListener("click", () => {
-      const payload = state.lastAiReply || state.history.slice(-1)[0]?.text || "";
-      if (!payload) {
-        notify("Escribe o recibe algo antes de mandar a WhatsApp.");
-        return;
-      }
-      const waUrl = `https://wa.me/?text=${encodeURIComponent(payload)}`;
-      window.open(waUrl, "_blank", "noopener,noreferrer");
-      notify("Abriendo WhatsApp...");
-    });
-
-    els.newChatBtn.addEventListener("click", () => {
-      state.userName = "";
-      state.history = [];
-      state.lastAiReply = "";
-      saveState();
-      syncPanels();
-      notify("Conversación reiniciada.");
-    });
-
-    loadState();
-    syncPanels();
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.classList.add("show");
+      setTimeout(() => toast.classList.remove("show"), 2200);
+    }
   </script>
 </body>
 </html>
