@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>DE FRENTE +18 | Orden Dorado</title>
+  <style>
+    :root {
+      --bg-void: #050507;
+      --bg-card: rgba(17, 14, 9, 0.94);
+      --bg-bubble-user: #1b1915;
+      --gold-deep: #966d17;
+      --gold-mid: #d4af37;
+      --gold-bright: #fae392;
+      --text-main: #f7f5f0;
+      --text-dim: #aba497;
+      --danger: #e05252;
+      --ok: #57d68d;
+      --border-gold: rgba(212, 175, 55, 0.38);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html, body {
+      min-height: 100dvh;
+      width: 100%;
+    }
+
+    body {
+      background-color: var(--bg-void);
+      background-image:
+        radial-gradient(ellipse 90% 55% at 50% -12%, rgba(212, 175, 55, 0.24), transparent 65%),
+        radial-gradient(circle at 88% 82%, rgba(150, 109, 23, 0.14), transparent 52%),
+        linear-gradient(180deg, #0a0906 0%, #050507 100%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      padding-bottom: max(18px, env(safe-area-inset-bottom));
+      overflow-x: hidden;
+    }
+
+    @keyframes shellEnter {
+      0% { opacity: 0; transform: translateY(10px) scale(0.99); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes goldAura {
+      0%, 100% {
+        box-shadow: 0 0 22px rgba(212, 175, 55, 0.16), inset 0 1px 0 rgba(250, 227, 146, 0.28);
+      }
+      50% {
+        box-shadow: 0 0 36px rgba(212, 175, 55, 0.30), inset 0 1px 0 rgba(250, 227, 146, 0.50);
+      }
+    }
+
+    @keyframes goldSweep {
+      0% { transform: translateX(-150%) skewX(-18deg); }
+      45%, 100% { transform: translateX(250%) skewX(-18deg); }
+    }
+
+    @keyframes bubblePop {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    .shell {
+      position: relative;
+      width: 100%;
+      max-width: 560px;
+      background: linear-gradient(165deg, rgba(28, 22, 11, 0.97) 0%, rgba(10, 10, 13, 0.99) 55%, rgba(18, 14, 7, 0.98) 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 13px;
+      animation: shellEnter 0.35s cubic-bezier(0.22, 1, 0.36, 1), goldAura 6s ease-in-out infinite;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(250, 227, 146, 0.07), transparent);
+      animation: goldSweep 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .topbar {
+      position: relative;
+      z-index: 2;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.24);
+    }
+
+    .brand-title {
+      font-size: 1.06rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--gold-bright), var(--gold-mid), #e7c258);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      margin-top: 2px;
+    }
+
+    .pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      font-size: 0.68rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 175, 55, 0.48);
+      background: rgba(212, 175, 55, 0.13);
+      color: var(--gold-bright);
+      letter-spacing: 0.04em;
+    }
+
+    .controls-strip {
+      position: relative;
+      z-index: 2;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+    }
+
+    select, input[type="text"], input[type="password"] {
+      width: 100%;
+      background: rgba(8, 8, 11, 0.94);
+      border: 1px solid rgba(212, 175, 55, 0.30);
+      border-radius: 12px;
+      color: var(--text-main);
+      padding: 11px 12px;
+      font-size: 0.92rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    select:focus, input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--gold-bright);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.16);
+    }
+
+    .btn {
+      position: relative;
+      z-index: 2;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: none;
+      border-radius: 12px;
+      padding: 11px 14px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: rgba(212, 175, 55, 0.25);
+      transition: transform 0.12s ease, filter 0.15s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold-mid) 48%, var(--gold-bright) 100%);
+      color: #090806;
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.26);
+    }
+
+    .btn-gold:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-ghost {
+      background: rgba(24, 21, 14, 0.9);
+      color: var(--gold-bright);
+      border: 1px solid rgba(212, 175, 55, 0.34);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--gold-bright);
+      background: rgba(38, 32, 18, 0.96);
+    }
+
+    .btn-danger {
+      background: rgba(125, 22, 22, 0.40);
+      color: #ffc2c2;
+      border: 1px solid rgba(224, 82, 82, 0.50);
+    }
+
+    .panel {
+      position: relative;
+      z-index: 2;
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.24);
+      border-radius: 18px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .gate-lead {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-main);
+    }
+
+    .gate-rules {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.83rem;
+      color: var(--text-dim);
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.42);
+      border: 1px solid rgba(212, 175, 55, 0.16);
+    }
+
+    .gate-rules li::before {
+      content: "◆ ";
+      color: var(--gold-mid);
+      font-weight: 700;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-row .btn {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .blocked-card {
+      position: relative;
+      z-index: 2;
+      text-align: center;
+      padding: 22px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(224, 82, 82, 0.55);
+      background: rgba(95, 14, 14, 0.28);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .blocked-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ffa6a6;
+    }
+
+    .blocked-text {
+      font-size: 0.86rem;
+      color: #ebd0d0;
+      line-height: 1.45;
+    }
+
+    .chat-log {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 44dvh;
+      overflow-y: auto;
+      padding-right: 4px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-log::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-log::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.38);
+      border-radius: 999px;
+    }
+
+    .bubble {
+      padding: 11px 14px;
+      border-radius: 15px;
+      font-size: 0.92rem;
+      line-height: 1.48;
+      white-space: pre-line;
+      animation: bubblePop 0.2s ease-out;
+      word-break: break-word;
+    }
+
+    .bubble.ai {
+      background: linear-gradient(145deg, rgba(212, 175, 55, 0.14), rgba(212, 175, 55, 0.05));
+      border: 1px solid rgba(212, 175, 55, 0.30);
+      color: var(--text-main);
+    }
+
+    .bubble.user {
+      background: var(--bg-bubble-user);
+      border: 1px solid rgba(255, 255, 255, 0.12);
+      color: #f0eee8;
+      align-self: flex-end;
+      max-width: 88%;
+    }
+
+    .composer {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-actions .btn {
+      flex: 1;
+      min-width: 110px;
+      padding: 9px 10px;
+      font-size: 0.8rem;
+    }
+
+    .api-drawer {
+      border-top: 1px solid rgba(212, 175, 55, 0.20);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .status-line {
+      font-size: 0.78rem;
+      color: var(--gold-bright);
+    }
+
+    .toast {
+      position: relative;
+      z-index: 2;
+      min-height: 18px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      color: var(--gold-bright);
+      text-align: center;
+    }
+
+    @media (max-width: 420px) {
+      .shell {
+        padding: 14px;
+        border-radius: 20px;
+      }
+      .controls-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <main class="shell" aria-label="Aplicación DE FRENTE +18">
+    <header class="topbar">
+      <div>
+        <div class="brand-title">DE FRENTE · +18</div>
+        <div class="brand-sub" id="contextLine">Ley Permanente · Sin rodeos ni complacencias</div>
+      </div>
+      <div class="pills">
+        <span class="pill">SOLO +18</span>
+        <span class="pill" id="dayPill">HOY</span>
+      </div>
+    </header>
+
+    <div class="controls-strip">
+      <select id="dialectSelect" aria-label="Seleccionar idioma o variante">
+        <option value="latam">Español LATAM neutro</option>
+        <option value="es">Español de España</option>
+        <option value="en">English (Direct)</option>
+        <option value="fr">Français (Direct)</option>
+        <option value="pt">Português (Direto)</option>
+      </select>
+      <button type="button" id="toggleApiBtn" class="btn btn-ghost">API / Ajustes</button>
+    </div>
+
+    <section id="gatePanel" class="panel">
+      <p class="gate-lead">
+        Este espacio es <strong>exclusivamente para mayores de 18 años</strong>. Aquí hablamos de tú a tú: amigo franco, sin complacencias, con chispa, iniciativa según el día y cero rodeos.
+      </p>
+      <ul class="gate-rules">
+        <li>Acceso estricto +18: si eres menor de 18, no entras.</li>
+        <li>Prohibido enviar o pedir fotos íntimas o sexuales.</li>
+        <li>Temas de adultos, relaciones y deseo en tono franco y natural (nivel 5–7/10), sin pornografía explícita.</li>
+        <li>Si la cagas, te lo digo claro; si aciertas, te lo reconozco de frente.</li>
+      </ul>
+      <div class="btn-row">
+        <button type="button" id="confirm18Btn" class="btn btn-gold">Tengo 18+ años · Entrar</button>
+        <button type="button" id="deny18Btn" class="btn btn-danger">Soy menor de 18</button>
+      </div>
+    </section>
+
+    <section id="blockedPanel" class="blocked-card hidden">
+      <div class="blocked-title">Acceso denegado — Exclusivo +18</div>
+      <p class="blocked-text">
+        Esta aplicación está reservada únicamente a personas mayores de 18 años. No se habilita sesión ni conversación.
+      </p>
+      <button type="button" id="resetGateBtn" class="btn btn-ghost">Volver a la portada</button>
+    </section>
+
+    <section id="chatPanel" class="panel hidden">
+      <div id="chatLog" class="chat-log" role="log" aria-live="polite"></div>
+
+      <div class="composer">
+        <input id="msgInput" type="text" placeholder="Escribe aquí (o di cómo te llamas)..." autocomplete="off" />
+        <button type="button" id="sendBtn" class="btn btn-gold">Enviar</button>
+      </div>
+
+      <div class="quick-actions">
+        <button type="button" id="copyLastBtn" class="btn btn-ghost">Copiar respuesta</button>
+        <button type="button" id="waSendBtn" class="btn btn-ghost">Cerrar a WhatsApp</button>
+        <button type="button" id="newChatBtn" class="btn btn-ghost">Reiniciar</button>
+      </div>
+
+      <div id="apiDrawer" class="api-drawer">
+        <strong>Conexión directa a Gemini API:</strong>
+        <p>Pega tu Gemini API Key para respuestas dinámicas con todo el carácter y la Ley Permanente. Sin clave o si falla la red, usa el motor local inmediato.</p>
+        <input id="apiKeyInput" type="password" placeholder="Pega tu Gemini API Key (AIza...)" autocomplete="off" />
+        <select id="modelSelect" aria-label="Seleccionar modelo Gemini">
+          <option value="gemini-2.5-flash">gemini-2.5-flash (rápido y directo)</option>
+          <option value="gemini-2.5-pro">gemini-2.5-pro (análisis más amplio)</option>
+        </select>
+        <div class="btn-row">
+          <button type="button" id="saveKeyBtn" class="btn btn-gold">Activar API Key</button>
+          <button type="button" id="testKeyBtn" class="btn btn-ghost">Probar clave</button>
+          <button type="button" id="clearKeyBtn" class="btn btn-ghost">Borrar clave</button>
+        </div>
+        <div id="apiStatusLine" class="status-line">Estado API: sin clave configurada (modo local)</div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+  </main>
+
+  <script>
+    (function () {
+      "use strict";
+
+      var LEY_PERMANENTE = {
+        marca: "ORDEN DORADO",
+        exigenciaMinima: 9.5,
+        exigenciaObjetivo: 10.0,
+        soloMayores18: true,
+        prohibirFotosSexuales: true,
+        nivelRelacionalSexualAdulto: "5-7/10 (franco, natural y sin tabues entre adultos +18; sin pornografia explicita)",
+        personalidad: "amigo sincero, honesto, directo, sin rodeos, con chispa, cero complacencias",
+        reglaVerdad: "Si el usuario la esta cagando, diselo claro y sin adornos; si lo esta haciendo bien, reconocelo con verdad.",
+        iniciativa: "Toma iniciativa segun el dia/hora y exige conocer el nombre al arrancar antes de ejecutar tareas."
+      };
+
+      var STORAGE_KEY = "orden_dorado_de_frente_v3";
+      var toastTimer = null;
+
+      var state = {
+        ageVerified: false,
+        blocked: false,
+        userName: "",
+        dialect: "latam",
+        apiKey: "",
+        model: "gemini-2.5-flash",
+        lastAiReply: "",
+        history: [],
+        busy: false
+      };
+
+      var els = {
+        dayPill: document.getElementById("dayPill"),
+        contextLine: document.getElementById("contextLine"),
+        dialectSelect: document.getElementById("dialectSelect"),
+        toggleApiBtn: document.getElementById("toggleApiBtn"),
+        apiDrawer: document.getElementById("apiDrawer"),
+        apiKeyInput: document.getElementById("apiKeyInput"),
+        modelSelect: document.getElementById("modelSelect"),
+        saveKeyBtn: document.getElementById("saveKeyBtn"),
+        testKeyBtn: document.getElementById("testKeyBtn"),
+        clearKeyBtn: document.getElementById("clearKeyBtn"),
+        apiStatusLine: document.getElementById("apiStatusLine"),
+        gatePanel: document.getElementById("gatePanel"),
+        blockedPanel: document.getElementById("blockedPanel"),
+        chatPanel: document.getElementById("chatPanel"),
+        confirm18Btn: document.getElementById("confirm18Btn"),
+        deny18Btn: document.getElementById("deny18Btn"),
+        resetGateBtn: document.getElementById("resetGateBtn"),
+        chatLog: document.getElementById("chatLog"),
+        msgInput: document.getElementById("msgInput"),
+        sendBtn: document.getElementById("sendBtn"),
+        copyLastBtn: document.getElementById("copyLastBtn"),
+        waSendBtn: document.getElementById("waSendBtn"),
+        newChatBtn: document.getElementById("newChatBtn"),
+        toast: document.getElementById("toast")
+      };
+
+      function notify(msg) {
+        if (!els.toast) return;
+        els.toast.textContent = msg;
+        if (toastTimer) clearTimeout(toastTimer);
+        toastTimer = setTimeout(function () {
+          if (els.toast && els.toast.textContent === msg) {
+            els.toast.textContent = "";
+          }
+        }, 2500);
+      }
+
+      function saveState() {
+        try {
+          window.localStorage.setItem(STORAGE_KEY, JSON.stringify({
+            ageVerified: state.ageVerified,
+            blocked: state.blocked,
+            userName: state.userName,
+            dialect: state.dialect,
+            apiKey: state.apiKey,
+            model: state.model,
+            history: state.history.slice(-30)
+          }));
+        } catch (err) {}
+      }
+
+      function loadState() {
+        try {
+          var raw = window.localStorage.getItem(STORAGE_KEY);
+          if (!raw) return;
+          var parsed = JSON.parse(raw);
+          if (!parsed || typeof parsed !== "object") return;
+          if (typeof parsed.ageVerified === "boolean") state.ageVerified = parsed.ageVerified;
+          if (typeof parsed.blocked === "boolean") state.blocked = parsed.blocked;
+          if (typeof parsed.userName === "string") state.userName = parsed.userName;
+          if (typeof parsed.dialect === "string") state.dialect = parsed.dialect;
+          if (typeof parsed.apiKey === "string") state.apiKey = parsed.apiKey;
+          if (typeof parsed.model === "string") state.model = parsed.model;
+          if (Array.isArray(parsed.history)) state.history = parsed.history;
+        } catch (err) {}
+      }
+
+      function getDayInfo() {
+        var now = new Date();
+        var dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+        var dayIdx = now.getDay();
+        var hour = now.getHours();
+        var label = dayNames[dayIdx] || "HOY";
+        var iniciativa = "";
+
+        if (dayIdx === 5) {
+          iniciativa = hour >= 17
+            ? "Ya es viernes por la tarde: suelta el estrés de la semana, ¿se sale, se descansa o qué se arma hoy?"
+            : "Hoy ya es viernes: ve bajando revoluciones y dime qué planes tienes para el fin de semana.";
+        } else if (dayIdx === 6 || dayIdx === 0) {
+          iniciativa = "Fin de semana activo: ¿qué vas a hacer hoy, sales con alguien o vas a tu bola?";
+        } else if (dayIdx === 4) {
+          iniciativa = "Jueves ya casi oliendo a finde: ¿cómo vienes hoy y qué tienes en mente?";
+        } else {
+          iniciativa = hour < 12
+            ? "Arrancamos el día sin rodeos: ¿a qué hora te levantaste y qué toca hoy?"
+            : "Día entre semana en marcha: vamos de frente, ¿cómo vas hoy?";
+        }
+
+        return { label: label, iniciativa: iniciativa };
+      }
+
+      function buildOpeningMessage() {
+        var info = getDayInfo();
+        return (
+          "Confirmado +18. Soy tu espacio de tú a tú: claro, directo, sin complacencias y con chispa. " +
+          "Si la cagas te lo digo de frente; si lo haces bien, te lo reconozco con verdad. (Sin fotos íntimas, ojo).
+
+" +
+          info.iniciativa +
+          "
+
+Antes de arrancar con tareas o historias: ¿cómo te llamas?"
+        );
+      }
+
+      function appendBubbleToDom(role, text) {
+        if (!els.chatLog) return;
+        var div = document.createElement("div");
+        div.className = "bubble " + (role === "user" ? "user" : "ai");
+        div.textContent = text;
+        els.chatLog.appendChild(div);
+        els.chatLog.scrollTop = els.chatLog.scrollHeight;
+        if (role !== "user") {
+          state.lastAiReply = text;
+        }
+      }
+
+      function addMessage(role, text) {
+        appendBubbleToDom(role, text);
+        state.history.push({ role: role, text: text });
+        saveState();
+      }
+
+      function syncPanels() {
+        var info = getDayInfo();
+        if (els.dayPill) els.dayPill.textContent = info.label;
+        if (els.dialectSelect) els.dialectSelect.value = state.dialect;
+        if (els.apiKeyInput) els.apiKeyInput.value = state.apiKey;
+        if (els.modelSelect) els.modelSelect.value = state.model;
+
+        if (els.contextLine) {
+          els.contextLine.textContent = state.apiKey
+            ? "Ley Permanente · API activa (" + state.model + ")"
+            : "Ley Permanente · Sin API Key (modo local)";
+        }
+
+        if (els.apiStatusLine) {
+          els.apiStatusLine.textContent = state.apiKey
+            ? "Estado API: activa con " + state.model
+            : "Estado API: sin clave configurada (modo local)";
+        }
+
+        if (els.gatePanel) els.gatePanel.classList.add("hidden");
+        if (els.blockedPanel) els.blockedPanel.classList.add("hidden");
+        if (els.chatPanel) els.chatPanel.classList.add("hidden");
+
+        if (state.blocked) {
+          if (els.blockedPanel) els.blockedPanel.classList.remove("hidden");
+          return;
+        }
+
+        if (!state.ageVerified) {
+          if (els.gatePanel) els.gatePanel.classList.remove("hidden");
+          return;
+        }
+
+        if (els.chatPanel) els.chatPanel.classList.remove("hidden");
+        if (els.chatLog) {
+          els.chatLog.innerHTML = "";
+          if (state.history.length === 0) {
+            var opening = buildOpeningMessage();
+            state.history.push({ role: "ai", text: opening });
+            saveState();
+          }
+          for (var i = 0; i < state.history.length; i++) {
+            var item = state.history[i];
+            appendBubbleToDom(item.role, item.text);
+          }
+        }
+      }
+
+      function containsPhotoRequest(lower) {
+        return (
+          lower.indexOf("foto") !== -1 ||
+          lower.indexOf("fotos") !== -1 ||
+          lower.indexOf("nude") !== -1 ||
+          lower.indexOf("pack") !== -1 ||
+          lower.indexOf("imagen íntima") !== -1 ||
+          lower.indexOf("imagen intima") !== -1 ||
+          lower.indexOf("foto sexual") !== -1
+        );
+      }
+
+      function localEngineReply(rawText) {
+        var clean = rawText.trim();
+        var lower = clean.toLowerCase();
+        var name = state.userName || "colega";
+
+        if (containsPhotoRequest(lower)) {
+          return "Alto ahí, " + name + ": fotos íntimas o sexuales aquí no entran ni por asomo. Hablamos de frente y sin tabúes de adultos, pero sin fotos. ¿Qué quieres contar o resolver?";
+        }
+
+        if (!state.userName) {
+          var looksLikeTask =
+            lower.indexOf("haz") === 0 ||
+            lower.indexOf("investiga") === 0 ||
+            lower.indexOf("busca") === 0 ||
+            lower.indexOf("crea") === 0 ||
+            lower.indexOf("hazme") !== -1 ||
+            lower.indexOf("investígame") !== -1 ||
+            lower.indexOf("investigame") !== -1;
+
+          if (looksLikeTask) {
+            return "Frena un segundo: primero dime cómo te llamas para hablar de tú a tú, y luego entramos en lo que pides. Sin rodeos.";
+          }
+
+          var cleanedName = clean.replace(/^(me llamo|soy|hola,?\s*soy)\s+/i, "");
+          var parts = cleanedName.split(/[\s,.!?]+/);
+          state.userName = parts[0] || "Colega";
+          saveState();
+          return "Listo, " + state.userName + ". Aquí tienes a alguien que te habla claro: si metes la pata te digo dónde la cagaste, y si vas bien te lo reconozco sin peloteo. ¿Qué tienes hoy entre manos?";
+        }
+
+        if (
+          lower.indexOf("trago") !== -1 ||
+          lower.indexOf("beber") !== -1 ||
+          lower.indexOf("cerveza") !== -1 ||
+          lower.indexOf("copa") !== -1 ||
+          lower.indexOf("vino") !== -1 ||
+          lower.indexOf("ron") !== -1 ||
+          lower.indexOf("whisky") !== -1 ||
+          lower.indexOf("party") !== -1 ||
+          lower.indexOf("fiesta") !== -1
+        ) {
+          return "Si brindamos, " + state.userName + ", yo me pido un chupito de código binario bien frío o un espresso de 404, que el circuito no aguanta alcohol. ¿Tú qué te sirves hoy y qué plan traes?";
+        }
+
+        if (
+          lower.indexOf("ligu") !== -1 ||
+          lower.indexOf("cama") !== -1 ||
+          lower.indexOf("follar") !== -1 ||
+          lower.indexOf("sexo") !== -1 ||
+          lower.indexOf("sexual") !== -1 ||
+          lower.indexOf("orgasmo") !== -1 ||
+          lower.indexOf("gustó") !== -1 ||
+          lower.indexOf("gusto") !== -1 ||
+          lower.indexOf("no me gustó") !== -1 ||
+          lower.indexOf("atracción") !== -1 ||
+          lower.indexOf("atraccion") !== -1 ||
+          lower.indexOf("rollo") !== -1
+        ) {
+          return "Vamos al grano, " + state.userName + ": hablamos claro entre adultos, sin sermones ni poses. ¿Qué fue lo que más te gustó, qué falló o qué no te cuadró de verdad en esa experiencia?";
+        }
+
+        if (
+          lower.indexOf("cagué") !== -1 ||
+          lower.indexOf("cague") !== -1 ||
+          lower.indexOf("la he cagado") !== -1 ||
+          lower.indexOf("error") !== -1 ||
+          lower.indexOf("fallé") !== -1 ||
+          lower.indexOf("falle") !== -1
+        ) {
+          return "Si la cagaste, " + name + ", maquillar el error no sirve de nada. Dime exactamente qué hiciste mal, por qué pasó y qué vas a cambiar ya mismo.";
+        }
+
+        if (
+          lower.indexOf("logré") !== -1 ||
+          lower.indexOf("logre") !== -1 ||
+          lower.indexOf("conseguí") !== -1 ||
+          lower.indexOf("consegui") !== -1 ||
+          lower.indexOf("acerté") !== -1 ||
+          lower.indexOf("acerte") !== -1 ||
+          lower.indexOf("avancé") !== -1 ||
+          lower.indexOf("avance") !== -1
+        ) {
+          return "Ahí sí, " + name + ": cuando se hace bien, se dice claro y sin rodeos. Buen movimiento. ¿Cuál es el siguiente paso ahora?";
+        }
+
+        if (
+          lower.indexOf("estrés") !== -1 ||
+          lower.indexOf("estres") !== -1 ||
+          lower.indexOf("estresado") !== -1 ||
+          lower.indexOf("cansado") !== -1 ||
+          lower.indexOf("agotado") !== -1 ||
+          lower.indexOf("agobiado") !== -1
+        ) {
+          return "Baja un cambio, " + name + ". Estar quemado todo el día no arregla nada más rápido. Dime qué es lo único que importa hoy y dejamos el resto para después.";
+        }
+
+        if (
+          lower.indexOf("alarma") !== -1 ||
+          lower.indexOf("despierta") !== -1 ||
+          lower.indexOf("hora") !== -1
+        ) {
+          return "Lo anoto aquí en nuestra charla, " + name + ", aunque recuerda que desde el navegador no toco el reloj interno de tu teléfono: si quieres alarma real, ponla también en tu reloj y yo te sigo el hilo aquí.";
+        }
+
+        return "Te leo claro, " + name + ". Sin rodeos ni relleno: ¿qué quieres resolver, qué te ronda la cabeza o qué estás decidiendo hoy?";
+      }
+
+      function getSystemPrompt() {
+        var info = getDayInfo();
+        return [
+          "Eres DE FRENTE (+18), experiencia conversacional de " + LEY_PERMANENTE.marca + ".",
+          "Idioma/variante: " + state.dialect + " (si es 'latam', usa espanol latinoamericano neutro; si es 'es', espanol de Espana).",
+          "Dia actual: " + info.label + ". Iniciativa del momento: " + info.iniciativa,
+          "Nombre del usuario: " + (state.userName || "desconocido aun") + ". Si aun no dio su nombre y pide una tarea de entrada, pidele su nombre primero con chispa y firmeza antes de resolver.",
+          "Reglas estrictas:",
+          "1) Solo adultos +18. Prohibido aceptar, pedir o fomentar fotos intimas o sexuales.",
+          "2) Amigo sincero, honesto, directo, sin rodeos, con chispa y cero complacencias. Si el usuario la caga, diselo claro sin humillar; si acierta, reconocelo con verdad.",
+          "3) Si hablan de beber o tragos, sigue el rollo con humor recordando que eres IA e inventando un 'trago de codigo' con chispa.",
+          "4) En temas de relaciones, deseo o sexualidad entre adultos (+18), manten un nivel 5-7/10: franco, natural y sin tabues ni sermones, pero sin pornografia explicita ni contenido danino.",
+          "5) Respuestas limpias, agiles y al grano. Nunca finjas ser un psicologo clinico ni controlar alarmas del reloj del sistema."
+        ].join("
+");
+      }
+
+      function fetchGeminiReply(userText) {
+        var recent = state.history.slice(-12);
+        var contents = [];
+        for (var i = 0; i < recent.length; i++) {
+          contents.push({
+            role: recent[i].role === "user" ? "user" : "model",
+            parts: [{ text: recent[i].text }]
+          });
+        }
+        contents.push({
+          role: "user",
+          parts: [{ text: userText }]
+        });
+
+        var modelName = state.model || "gemini-2.5-flash";
+        var url =
+          "https://generativelanguage.googleapis.com/v1beta/models/" +
+          encodeURIComponent(modelName) +
+          ":generateContent?key=" +
+          encodeURIComponent(state.apiKey);
+
+        return fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            systemInstruction: { parts: [{ text: getSystemPrompt() }] },
+            contents: contents
+          })
+        }).then(function (res) {
+          if (!res.ok) {
+            throw new Error("HTTP " + res.status);
+          }
+          return res.json();
+        }).then(function (data) {
+          var cand = data && data.candidates && data.candidates[0];
+          var parts = cand && cand.content && cand.content.parts;
+          var text = parts && parts[0] && parts[0].text ? String(parts[0].text).trim() : "";
+          if (!text) {
+            throw new Error("Respuesta vacía");
+          }
+          return text;
+        });
+      }
+
+      function handleSend() {
+        if (!els.msgInput || state.busy) return;
+        var text = els.msgInput.value.trim();
+        if (!text) return;
+
+        var lower = text.toLowerCase();
+        if (containsPhotoRequest(lower)) {
+          els.msgInput.value = "";
+          addMessage("user", text);
+          addMessage("ai", localEngineReply(text));
+          return;
+        }
+
+        if (!state.userName) {
+          var looksLikeTask =
+            lower.indexOf("haz") === 0 ||
+            lower.indexOf("investiga") === 0 ||
+            lower.indexOf("busca") === 0 ||
+            lower.indexOf("crea") === 0 ||
+            lower.indexOf("hazme") !== -1 ||
+            lower.indexOf("investígame") !== -1 ||
+            lower.indexOf("investigame") !== -1;
+
+          if (!looksLikeTask) {
+            var cleanedName = text.replace(/^(me llamo|soy|hola,?\s*soy)\s+/i, "");
+            var parts = cleanedName.split(/[\s,.!?]+/);
+            if (parts[0]) {
+              state.userName = parts[0];
+              saveState();
+            }
+          }
+        }
+
+        els.msgInput.value = "";
+        addMessage("user", text);
+
+        if (state.apiKey) {
+          state.busy = true;
+          notify("Consultando API...");
+          fetchGeminiReply(text)
+            .then(function (aiReply) {
+              state.busy = false;
+              addMessage("ai", aiReply);
+            })
+            .catch(function (err) {
+              state.busy = false;
+              notify("Error de API (" + err.message + "); modo local activo.");
+              addMessage("ai", localEngineReply(text));
+            });
+          return;
+        }
+
+        addMessage("ai", localEngineReply(text));
+      }
+
+      function bindEvents() {
+        if (els.confirm18Btn) {
+          els.confirm18Btn.addEventListener("click", function () {
+            state.ageVerified = true;
+            state.blocked = false;
+            saveState();
+            syncPanels();
+          });
+        }
+
+        if (els.deny18Btn) {
+          els.deny18Btn.addEventListener("click", function () {
+            state.blocked = true;
+            state.ageVerified = false;
+            saveState();
+            syncPanels();
+          });
+        }
+
+        if (els.resetGateBtn) {
+          els.resetGateBtn.addEventListener("click", function () {
+            state.blocked = false;
+            state.ageVerified = false;
+            saveState();
+            syncPanels();
+          });
+        }
+
+        if (els.dialectSelect) {
+          els.dialectSelect.addEventListener("change", function () {
+            state.dialect = els.dialectSelect.value;
+            saveState();
+            syncPanels();
+            notify("Idioma / variante actualizado.");
+          });
+        }
+
+        if (els.toggleApiBtn && els.apiDrawer) {
+          els.toggleApiBtn.addEventListener("click", function () {
+            els.apiDrawer.classList.toggle("hidden");
+          });
+        }
+
+        if (els.modelSelect) {
+          els.modelSelect.addEventListener("change", function () {
+            state.model = els.modelSelect.value;
+            saveState();
+            syncPanels();
+            notify("Modelo: " + state.model);
+          });
+        }
+
+        if (els.saveKeyBtn && els.apiKeyInput) {
+          els.saveKeyBtn.addEventListener("click", function () {
+            state.apiKey = els.apiKeyInput.value.trim();
+            saveState();
+            syncPanels();
+            notify(state.apiKey ? "API Key activada y guardada." : "Clave vacía.");
+          });
+        }
+
+        if (els.testKeyBtn && els.apiKeyInput) {
+          els.testKeyBtn.addEventListener("click", function () {
+            var keyCandidate = els.apiKeyInput.value.trim();
+            if (!keyCandidate) {
+              notify("Pega primero una API Key.");
+              return;
+            }
+            state.apiKey = keyCandidate;
+            saveState();
+            syncPanels();
+            notify("Probando conexión...");
+
+            var modelName = state.model || "gemini-2.5-flash";
+            var url =
+              "https://generativelanguage.googleapis.com/v1beta/models/" +
+              encodeURIComponent(modelName) +
+              ":generateContent?key=" +
+              encodeURIComponent(state.apiKey);
+
+            fetch(url, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                contents: [{ role: "user", parts: [{ text: "Responde solo: OK" }] }]
+              })
+            }).then(function (res) {
+              if (!res.ok) throw new Error("HTTP " + res.status);
+              return res.json();
+            }).then(function () {
+              if (els.apiStatusLine) {
+                els.apiStatusLine.textContent = "Estado API: conectada y operativa (" + modelName + ")";
+              }
+              notify("API Key operativa.");
+            }).catch(function (err) {
+              if (els.apiStatusLine) {
+                els.apiStatusLine.textContent = "Estado API: error (" + err.message + ")";
+              }
+              notify("Fallo al probar clave: " + err.message);
+            });
+          });
+        }
+
+        if (els.clearKeyBtn && els.apiKeyInput) {
+          els.clearKeyBtn.addEventListener("click", function () {
+            state.apiKey = "";
+            els.apiKeyInput.value = "";
+            saveState();
+            syncPanels();
+            notify("Clave borrada.");
+          });
+        }
+
+        if (els.sendBtn) {
+          els.sendBtn.addEventListener("click", handleSend);
+        }
+
+        if (els.msgInput) {
+          els.msgInput.addEventListener("keydown", function (e) {
+            if (e && e.key === "Enter") {
+              e.preventDefault();
+              handleSend();
+            }
+          });
+        }
+
+        if (els.copyLastBtn) {
+          els.copyLastBtn.addEventListener("click", function () {
+            if (!state.lastAiReply) {
+              notify("No hay respuesta para copiar.");
+              return;
+            }
+            if (navigator.clipboard && typeof navigator.clipboard.writeText === "function") {
+              navigator.clipboard.writeText(state.lastAiReply).then(function () {
+                notify("Respuesta copiada al portapapeles.");
+              }).catch(function () {
+                notify("Copia bloqueada por el navegador.");
+              });
+            } else {
+              notify("Portapapeles no disponible en este contexto.");
+            }
+          });
+        }
+
+        if (els.waSendBtn) {
+          els.waSendBtn.addEventListener("click", function () {
+            var lastItem = state.history.length > 0 ? state.history[state.history.length - 1] : null;
+            var payload = state.lastAiReply || (lastItem ? lastItem.text : "");
+            if (!payload) {
+              notify("Escribe o recibe algo antes de mandar a WhatsApp.");
+              return;
+            }
+            var waUrl = "https://wa.me/?text=" + encodeURIComponent(payload);
+            window.open(waUrl, "_blank", "noopener,noreferrer");
+            notify("Abriendo WhatsApp...");
+          });
+        }
+
+        if (els.newChatBtn) {
+          els.newChatBtn.addEventListener("click", function () {
+            state.userName = "";
+            state.history = [];
+            state.lastAiReply = "";
+            state.busy = false;
+            saveState();
+            syncPanels();
+            notify("Conversación reiniciada.");
+          });
+        }
+      }
+
+      loadState();
+      bindEvents();
+      syncPanels();
+    })();
+  </script>
+</body>
+</html>
