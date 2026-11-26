@@ -188,17 +188,12 @@
   </div>
 
   <script>
-    const AUTHORIZED_HASHES = [
-      "9399127568ee291e06d9fb721ffaa76d160dfac4e2f4ea71b78ecdb7ae2750e5", // GOLD-2026
-      "b5c5e8869c9b5a8370144f80ad7b3bbd0a3d4f10738d8d73b5df5b5fa1d24c30", // ORDEN-VIP
-      "431dbbe65d64e9e4dfd827f2c153ffbe2ee051df1bbbe0fb65f210515152a5ec"  // PRO-TRADER
-    ];
-
+    const VALID_CODES = ["GOLD-2026", "ORDEN-VIP", "PRO-TRADER"];
     let currentTradeType = "LONG";
     let lastSummaryText = "";
 
     window.onload = function() {
-      if (localStorage.getItem("ordenDoradoAuth_v3") === "true") {
+      if (localStorage.getItem("ordenDoradoAuth_v3_fixed") === "true") {
         document.getElementById("authModal").style.display = "none";
       }
       if (localStorage.getItem("od_cap")) document.getElementById("capital").value = localStorage.getItem("od_cap");
@@ -207,21 +202,12 @@
       calculate();
     };
 
-    async function hashString(str) {
-      const encoder = new TextEncoder();
-      const data = encoder.encode(str);
-      const subtle = (window.crypto && (window.crypto.subtle || window.crypto.webkitSubtle));
-      const hashBuffer = await subtle.digest("SHA-256", data);
-      return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
-    }
-
-    async function validateCode() {
+    function validateCode() {
       const inputCode = document.getElementById("accessCodeInput").value.trim().toUpperCase();
-      if (!inputCode) return;
-      const hashedInput = await hashString(inputCode);
-      if (AUTHORIZED_HASHES.includes(hashedInput)) {
-        localStorage.setItem("ordenDoradoAuth_v3", "true");
+      if (VALID_CODES.includes(inputCode)) {
+        localStorage.setItem("ordenDoradoAuth_v3_fixed", "true");
         document.getElementById("authModal").style.display = "none";
+        document.getElementById("authError").style.display = "none";
       } else {
         document.getElementById("authError").style.display = "block";
       }
@@ -318,14 +304,10 @@
       rrEl.innerText = rrText;
 
       lastSummaryText =
-        `ORDEN DORADO PRO 3.0 (${currentTradeType})
-` +
-        `Entrada: ${fmt(entry, sym)} | SL: ${fmt(stop, sym)} | TP: ${tp > 0 ? fmt(tp, sym) : "—"}
-` +
-        `Pérdida máx. (c/comisiones): ${fmt(totalMaxLoss, sym)}
-` +
-        `Ganancia neta TP: ${fmt(netProfit, sym)} (${roe >= 0 ? "+" : ""}${roe.toFixed(2)}% ROE)
-` +
+        `ORDEN DORADO PRO 3.0 (${currentTradeType})\n` +
+        `Entrada: ${fmt(entry, sym)} | SL: ${fmt(stop, sym)} | TP: ${tp > 0 ? fmt(tp, sym) : "—"}\n` +
+        `Pérdida máx. (c/comisiones): ${fmt(totalMaxLoss, sym)}\n` +
+        `Ganancia neta TP: ${fmt(netProfit, sym)} (${roe >= 0 ? "+" : ""}${roe.toFixed(2)}% ROE)\n` +
         `Posición / Margen: ${fmt(positionSize, sym)} / ${fmt(margin, sym)}
 ` +
         `Break-Even: ${fmt(breakEvenPrice, sym)} | R:R: ${rrText}`;
