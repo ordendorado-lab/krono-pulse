@@ -1,250 +1,969 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#0d0b09">
-<title>Imperio Dorado — Juego gratis de OrdenDorado</title>
-<meta name="description" content="Une piezas de oro y construye tu imperio. Juego gratis de OrdenDorado.">
-<style>
-:root{--bg:#0d0b09;--panel:#17140f;--line:#3b3224;--gold:#d4af5f;--gold2:#f3e3b5;--soft:#a99a7c;--cell:#1f1a13}
-*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;user-select:none;-webkit-user-select:none}
-html,body{height:100%;background:var(--bg);color:var(--gold2);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;overscroll-behavior:none}
-body{background:radial-gradient(ellipse 120% 70% at 50% 0%,#2b2215 0%,#13100c 55%,var(--bg) 100%) fixed;display:flex;flex-direction:column;align-items:center;padding:calc(14px + env(safe-area-inset-top)) 14px 24px}
-.top{width:100%;max-width:440px;display:flex;justify-content:space-between;align-items:center}
-.brand{font-size:10.5px;letter-spacing:.3em;color:var(--gold);font-weight:700;text-transform:uppercase}
-.icon{width:38px;height:38px;border-radius:50%;border:1px solid var(--line);background:var(--panel);color:var(--gold2);font-size:16px;display:flex;align-items:center;justify-content:center;cursor:pointer}
-h1{font-family:Georgia,"Times New Roman",serif;font-weight:400;font-size:clamp(30px,8vw,40px);margin-top:8px;letter-spacing:.01em;
-   background:linear-gradient(180deg,#fff3cf 0%,#e5c174 55%,#a77d32 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
-.tag{font-size:13px;color:var(--soft);margin:4px 0 14px;text-align:center}
-.scores{width:100%;max-width:440px;display:grid;grid-template-columns:1fr 1fr auto;gap:8px;margin-bottom:12px}
-.sc{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:8px 12px}
-.sc small{display:block;font-size:10px;letter-spacing:.18em;color:var(--soft);text-transform:uppercase}
-.sc b{font-size:22px;font-weight:700;color:var(--gold2);font-variant-numeric:tabular-nums}
-.undo{border:1px solid var(--line);background:var(--panel);border-radius:14px;color:var(--gold2);padding:0 14px;font-size:12px;font-weight:700;letter-spacing:.06em;cursor:pointer}
-.undo:disabled{opacity:.35}
-#board{position:relative;width:min(92vw,440px);aspect-ratio:1;background:linear-gradient(145deg,#211b13,#15110c);border-radius:20px;
-  border:1px solid #4a3d29;box-shadow:0 20px 60px rgba(0,0,0,.6),inset 0 1px 0 rgba(255,230,170,.08);touch-action:none;padding:3%}
-.cellbg{position:absolute;border-radius:12%;background:var(--cell);box-shadow:inset 0 2px 6px rgba(0,0,0,.45)}
-.t{position:absolute;border-radius:12%;display:flex;flex-direction:column;align-items:center;justify-content:center;
-   transition:transform 115ms ease-in-out;will-change:transform;z-index:2}
-.t .v{font-weight:800;line-height:1;font-variant-numeric:tabular-nums;text-shadow:0 1px 0 rgba(255,255,255,.25)}
-.t .n{font-size:clamp(7px,2.1vw,10px);letter-spacing:.14em;text-transform:uppercase;margin-top:4px;font-weight:700;opacity:.85}
-.t.new{animation:appear 180ms ease-out}
-.t.pop{animation:pop 200ms ease-out}
-@keyframes appear{from{opacity:0;scale:.5}to{opacity:1;scale:1}}
-@keyframes pop{0%{scale:1}45%{scale:1.16}100%{scale:1}}
-.float{position:absolute;z-index:5;font-weight:800;color:var(--gold2);pointer-events:none;font-size:18px;text-shadow:0 2px 8px rgba(0,0,0,.8);animation:up 700ms ease-out forwards}
-@keyframes up{to{transform:translateY(-38px);opacity:0}}
-.spark{position:absolute;z-index:6;width:6px;height:6px;border-radius:50%;pointer-events:none;background:radial-gradient(#fff6d8,#d4af5f);animation:spark 550ms ease-out forwards}
-@keyframes spark{to{transform:translate(var(--dx),var(--dy)) scale(.2);opacity:0}}
-.coll{width:100%;max-width:440px;margin-top:14px;background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:10px 12px}
-.coll small{font-size:10px;letter-spacing:.18em;color:var(--soft);text-transform:uppercase}
-.row{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-top:8px}
-.dot{aspect-ratio:1;border-radius:6px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#5a4d38}
-.dot.on{border-color:transparent;color:#1a140b}
-.next{font-size:12px;color:var(--gold2);margin-top:8px}
-.shop{display:block;width:100%;max-width:440px;margin-top:14px;text-align:center;text-decoration:none;padding:15px;border-radius:16px;
-  background:linear-gradient(135deg,#f5e1a6,#d4af5f 55%,#a9822f);color:#17110a;font-weight:800;letter-spacing:.1em;text-transform:uppercase;font-size:13px;
-  box-shadow:0 8px 28px rgba(212,175,95,.25)}
-.hint{font-size:12px;color:var(--soft);margin-top:10px;text-align:center}
-.toast{position:fixed;left:50%;top:calc(18px + env(safe-area-inset-top));transform:translate(-50%,-250%);background:#1c1710;border:1px solid var(--gold);
-  border-radius:30px;padding:10px 18px;font-size:13px;font-weight:700;color:var(--gold2);z-index:50;transition:transform .35s ease;white-space:nowrap}
-.toast.show{transform:translate(-50%,0)}
-#modal{position:fixed;inset:0;background:rgba(8,6,4,.88);display:none;align-items:center;justify-content:center;z-index:40;padding:20px}
-#modal .box{width:100%;max-width:360px;background:linear-gradient(180deg,#1d1810,#120f0b);border:1px solid var(--gold);border-radius:22px;padding:26px 22px;text-align:center}
-#modal h2{font-family:Georgia,serif;font-weight:400;font-size:30px;margin:6px 0 8px;color:var(--gold2)}
-#modal p{font-size:14px;color:var(--soft);line-height:1.5}
-#modal .big{font-size:40px;font-weight:800;color:var(--gold2);margin:10px 0 2px}
-.btn{display:block;width:100%;margin-top:12px;padding:14px;border-radius:14px;border:0;font-weight:800;font-size:13px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;text-decoration:none;text-align:center}
-.gold{background:linear-gradient(135deg,#f5e1a6,#d4af5f 55%,#a9822f);color:#17110a}
-.line{background:none;border:1px solid var(--gold);color:var(--gold2)}
-@media (prefers-reduced-motion:reduce){.t{transition:none}.t.new,.t.pop{animation:none}}
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DE FRENTE +18 | Orden Dorado</title>
+  <style>
+    :root {
+      --bg-void: #050507;
+      --bg-surface: #0d0c0a;
+      --bg-card: rgba(18, 15, 10, 0.92);
+      --bg-bubble-user: #1a1814;
+      --gold-deep: #9e761e;
+      --gold-mid: #d4af37;
+      --gold-bright: #f7dc88;
+      --gold-glow: rgba(212, 175, 55, 0.26);
+      --text-main: #f6f4ef;
+      --text-dim: #a8a296;
+      --danger: #e05252;
+      --ok: #57d68d;
+      --border-gold: rgba(212, 175, 55, 0.34);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      min-height: 100dvh;
+      background-color: var(--bg-void);
+      background-image:
+        radial-gradient(ellipse 85% 55% at 50% -10%, rgba(212, 175, 55, 0.19), transparent 65%),
+        radial-gradient(circle at 85% 80%, rgba(158, 118, 30, 0.11), transparent 50%),
+        linear-gradient(180deg, #090806 0%, #050507 100%);
+      color: var(--text-main);
+      font-family: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 12px;
+      overflow-x: hidden;
+    }
+
+    @keyframes shellEnter {
+      0% { opacity: 0; transform: translateY(12px) scale(0.99); }
+      100% { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes goldPulse {
+      0%, 100% { box-shadow: 0 0 18px rgba(212, 175, 55, 0.14), inset 0 1px 0 rgba(247, 220, 136, 0.25); }
+      50% { box-shadow: 0 0 30px rgba(212, 175, 55, 0.28), inset 0 1px 0 rgba(247, 220, 136, 0.45); }
+    }
+
+    @keyframes sheenSweep {
+      0% { transform: translateX(-140%) skewX(-18deg); }
+      45%, 100% { transform: translateX(240%) skewX(-18deg); }
+    }
+
+    @keyframes msgIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .shell {
+      position: relative;
+      width: 100%;
+      max-width: 560px;
+      background: linear-gradient(165deg, rgba(25, 20, 11, 0.96) 0%, rgba(10, 10, 13, 0.98) 55%, rgba(16, 13, 7, 0.97) 100%);
+      border: 1px solid var(--border-gold);
+      border-radius: 24px;
+      padding: 18px;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      animation: shellEnter 0.4s cubic-bezier(0.22, 1, 0.36, 1), goldPulse 6s ease-in-out infinite;
+      overflow: hidden;
+    }
+
+    .shell::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 45%;
+      height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(247, 220, 136, 0.06), transparent);
+      animation: sheenSweep 8s ease-in-out infinite;
+      pointer-events: none;
+    }
+
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid rgba(212, 175, 55, 0.22);
+      z-index: 1;
+    }
+
+    .brand-group {
+      display: flex;
+      flex-direction: column;
+      gap: 2px;
+    }
+
+    .brand-title {
+      font-size: 1.05rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      background: linear-gradient(90deg, var(--gold-bright), var(--gold-mid), #e5be52);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      letter-spacing: 0.03em;
+    }
+
+    .pills {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
+    }
+
+    .pill {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 4px 9px;
+      border-radius: 999px;
+      border: 1px solid rgba(212, 175, 55, 0.45);
+      background: rgba(212, 175, 55, 0.12);
+      color: var(--gold-bright);
+      letter-spacing: 0.04em;
+    }
+
+    .controls-strip {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 8px;
+      z-index: 1;
+    }
+
+    select, input[type="text"], input[type="password"] {
+      width: 100%;
+      background: rgba(8, 8, 11, 0.92);
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      border-radius: 12px;
+      color: var(--text-main);
+      padding: 10px 12px;
+      font-size: 0.9rem;
+      outline: none;
+      transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    select:focus, input[type="text"]:focus, input[type="password"]:focus {
+      border-color: var(--gold-bright);
+      box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.14);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      border: none;
+      border-radius: 12px;
+      padding: 10px 14px;
+      font-size: 0.86rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: transform 0.14s ease, filter 0.15s ease, box-shadow 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .btn:active {
+      transform: scale(0.97);
+    }
+
+    .btn-gold {
+      background: linear-gradient(135deg, var(--gold-deep) 0%, var(--gold-mid) 48%, var(--gold-bright) 100%);
+      color: #090806;
+      box-shadow: 0 4px 16px rgba(212, 175, 55, 0.25);
+    }
+
+    .btn-gold:hover {
+      filter: brightness(1.08);
+    }
+
+    .btn-ghost {
+      background: rgba(24, 21, 14, 0.85);
+      color: var(--gold-bright);
+      border: 1px solid rgba(212, 175, 55, 0.32);
+    }
+
+    .btn-ghost:hover {
+      border-color: var(--gold-bright);
+      background: rgba(36, 30, 18, 0.95);
+    }
+
+    .btn-danger {
+      background: rgba(120, 22, 22, 0.35);
+      color: #ffb8b8;
+      border: 1px solid rgba(224, 82, 82, 0.45);
+    }
+
+    .panel {
+      background: var(--bg-card);
+      border: 1px solid rgba(212, 175, 55, 0.22);
+      border-radius: 18px;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      z-index: 1;
+    }
+
+    .hidden {
+      display: none !important;
+    }
+
+    .gate-lead {
+      font-size: 0.95rem;
+      line-height: 1.5;
+      color: var(--text-main);
+    }
+
+    .gate-rules {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      padding: 10px 12px;
+      border-radius: 12px;
+      background: rgba(0, 0, 0, 0.38);
+      border: 1px solid rgba(212, 175, 55, 0.14);
+    }
+
+    .gate-rules li::before {
+      content: "◆ ";
+      color: var(--gold-mid);
+      font-weight: 700;
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .btn-row .btn {
+      flex: 1;
+      min-width: 130px;
+    }
+
+    .blocked-card {
+      text-align: center;
+      padding: 24px 16px;
+      border-radius: 18px;
+      border: 1px solid rgba(224, 82, 82, 0.5);
+      background: rgba(90, 14, 14, 0.24);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      z-index: 1;
+    }
+
+    .blocked-title {
+      font-size: 1rem;
+      font-weight: 800;
+      color: #ff9e9e;
+    }
+
+    .blocked-text {
+      font-size: 0.86rem;
+      color: #e6c2c2;
+      line-height: 1.45;
+    }
+
+    .chat-log {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      max-height: 44dvh;
+      overflow-y: auto;
+      padding-right: 4px;
+      scroll-behavior: smooth;
+    }
+
+    .chat-log::-webkit-scrollbar {
+      width: 5px;
+    }
+
+    .chat-log::-webkit-scrollbar-thumb {
+      background: rgba(212, 175, 55, 0.35);
+      border-radius: 999px;
+    }
+
+    .bubble {
+      padding: 11px 14px;
+      border-radius: 15px;
+      font-size: 0.92rem;
+      line-height: 1.48;
+      white-space: pre-line;
+      animation: msgIn 0.22s ease-out;
+      word-break: break-word;
+    }
+
+    .bubble.ai {
+      background: linear-gradient(145deg, rgba(212, 175, 55, 0.12), rgba(212, 175, 55, 0.05));
+      border: 1px solid rgba(212, 175, 55, 0.28);
+      color: var(--text-main);
+    }
+
+    .bubble.user {
+      background: var(--bg-bubble-user);
+      border: 1px solid rgba(255, 255, 255, 0.1);
+      color: #eceae4;
+      align-self: flex-end;
+      max-width: 88%;
+    }
+
+    .composer {
+      display: flex;
+      gap: 8px;
+      align-items: center;
+    }
+
+    .quick-actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quick-actions .btn {
+      flex: 1;
+      min-width: 115px;
+      padding: 8px 10px;
+      font-size: 0.8rem;
+    }
+
+    .api-drawer {
+      border-top: 1px solid rgba(212, 175, 55, 0.18);
+      padding-top: 10px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      font-size: 0.8rem;
+      color: var(--text-dim);
+    }
+
+    .toast {
+      min-height: 18px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      color: var(--gold-bright);
+      text-align: center;
+      z-index: 1;
+    }
+
+    @media (max-width: 420px) {
+      .shell {
+        padding: 14px;
+        border-radius: 20px;
+      }
+      .controls-strip {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="top">
-  <div class="brand">OrdenDorado</div>
-  <div style="display:flex;gap:8px">
-    <button class="icon" id="snd" aria-label="Sonido">♪</button>
-    <button class="icon" id="rst" aria-label="Nueva partida">↻</button>
-  </div>
-</div>
-<h1>Imperio Dorado</h1>
-<p class="tag">Desliza para unir piezas iguales. De una pepita… a un imperio.</p>
-<div class="scores">
-  <div class="sc"><small>Puntos</small><b id="score">0</b></div>
-  <div class="sc"><small>Récord</small><b id="best">0</b></div>
-  <button class="undo" id="undo">DESHACER<br><span id="ucount" style="font-weight:400;opacity:.7">x3</span></button>
-</div>
-<div id="board"></div>
-<div class="coll">
-  <small>Tu colección</small>
-  <div class="row" id="row"></div>
-  <div class="next" id="next"></div>
-  <div class="next" style="color:#d4af5f">🎁 Llega a la <b>Corona (512)</b> y gana un <b>15% de descuento</b> en la tienda OrdenDorado de Etsy</div>
-</div>
-<a class="shop" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">✦ Visita la tienda OrdenDorado</a>
-<p class="hint">Agendas, diarios, libros y plantillas premium</p>
-<div id="intro" style="position:fixed;inset:0;background:radial-gradient(ellipse at 50% 30%,#2b2215,#0d0b09 70%);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:60;padding:24px;text-align:center">
-  <div class="brand">OrdenDorado</div>
-  <h1 style="font-size:44px;margin:10px 0 6px">Imperio Dorado</h1>
-  <p style="color:#a99a7c;font-size:14px;max-width:300px;line-height:1.5">Une piezas de oro, desbloquea tu colección y llega a la <b style="color:#f3e3b5">Corona</b> para ganar un <b style="color:#f3e3b5">15% de descuento</b>.</p>
-  <button id="play" class="btn gold" style="max-width:280px;margin-top:22px;font-size:15px;padding:17px">▶ Jugar</button>
-</div>
-<div class="toast" id="toast"></div>
-<div id="gift" style="position:fixed;inset:0;background:rgba(8,6,4,.9);display:none;align-items:center;justify-content:center;z-index:45;padding:20px"><div class="box" style="width:100%;max-width:360px;background:linear-gradient(180deg,#221b11,#120f0b);border:1px solid #d4af5f;border-radius:22px;padding:26px 22px;text-align:center">
-  <div class="brand">¡Llegaste a la Corona!</div>
-  <h2 style="font-family:Georgia,serif;font-weight:400;font-size:28px;margin:8px 0;color:#f3e3b5">Tu premio: 15% de descuento</h2>
-  <p style="font-size:14px;color:#a99a7c;line-height:1.5">Usa este código al pagar en la tienda OrdenDorado de Etsy (agendas, diarios y plantillas digitales):</p>
-  <div id="code" style="margin:14px auto 4px;padding:14px;border:2px dashed #d4af5f;border-radius:14px;font-size:28px;font-weight:800;letter-spacing:.12em;color:#f3e3b5">IMPERIO15</div>
-  <button class="btn line" id="copy">Copiar código</button>
-  <a class="btn gold" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">Usarlo en Etsy</a>
-  <button class="btn line" id="keep">Seguir jugando</button>
-</div></div>
-<div id="modal"><div class="box">
-  <div class="brand" id="mk">Fin de la partida</div>
-  <h2 id="mt">Buen intento</h2>
-  <div class="big" id="ms">0</div>
-  <p id="mp"></p>
-  <a class="btn gold" href="https://ordendorado.etsy.com" target="_blank" rel="noopener">Visita la tienda OrdenDorado</a>
-  <button class="btn line" id="share">Retar a un amigo</button>
-  <button class="btn line" id="again">Jugar otra vez</button>
-</div></div>
-<script>
-(()=>{
-const N=4;
-const LV=[null,
- ["2","Pepita"],["4","Moneda"],["8","Lingote"],["16","Anillo"],["32","Pulsera"],["64","Reloj"],
- ["128","Collar"],["256","Cetro"],["512","Corona"],["1024","Trono"],["2048","Imperio"],["4096","Leyenda"],["8192","Mito"]];
-const STY=l=>{
-  const t=[null,
-   ["#3a2f22","#2c241a","#c9ab74"],["#4a3a24","#34291a","#e2c48a"],["#6b5028","#4a3519","#f4dca2"],
-   ["#8a6a2e","#5f4519","#fff0c6"],["#a8802f","#76561b","#fff6da"],["#c49a3c","#8c6620","#2a1c08"],
-   ["#ddb54f","#a67a24","#241706"],["#f0cd63","#bf8f2c","#1f1404"],["#ffe08a","#d4a63c","#1a1103"],
-   ["#fff0bd","#e8c060","#1a1103"],["#ffffff","#f3d98d","#1a1103"],["#e8f3ff","#a9c6e8","#0b1726"],["#f6e8ff","#c9a9ef","#1a0b26"]][Math.min(l,13)];
-  return {bg:`linear-gradient(145deg,${t[0]},${t[1]})`,fg:t[2],glow:l>=7?`0 0 ${8+l*2}px rgba(255,214,120,${Math.min(.15+l*.04,.6)})`:"0 3px 10px rgba(0,0,0,.4)"};
-};
-const $=id=>document.getElementById(id);
-const board=$("board");
-let tiles=[],idc=0,score=0,best=0,maxLv=1,hist=[],undos=3,busy=false,sound=true,won=false,gifted=false,ac=null;
-const store={get(k,d){try{const v=localStorage.getItem(k);return v===null?d:JSON.parse(v)}catch(e){return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch(e){}}};
-best=store.get("od_imp_best",0);sound=store.get("od_imp_snd",true);
-let unlocked=store.get("od_imp_unl",1);
+  <main class="shell" aria-label="Aplicación DE FRENTE +18">
+    <header class="topbar">
+      <div class="brand-group">
+        <div class="brand-title">DE FRENTE · +18</div>
+        <div class="brand-sub" id="contextLine">Ley Permanente · Sin rodeos ni complacencias</div>
+      </div>
+      <div class="pills">
+        <span class="pill">SOLO +18</span>
+        <span class="pill" id="dayPill">HOY</span>
+      </div>
+    </header>
 
-function geom(){const s=board.clientWidth,pad=s*.03,gap=s*.025,cs=(s-2*pad-3*gap)/4;return {pad,gap,cs}}
-function pos(r,c){const g=geom();return [g.pad+c*(g.cs+g.gap),g.pad+r*(g.cs+g.gap)]}
-function drawBg(){board.querySelectorAll(".cellbg").forEach(e=>e.remove());const g=geom();
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const d=document.createElement("div");d.className="cellbg";const[x,y]=pos(r,c);
-  Object.assign(d.style,{width:g.cs+"px",height:g.cs+"px",left:x+"px",top:y+"px"});board.appendChild(d)}}
-function paint(t){const g=geom(),s=STY(t.lv),[x,y]=pos(t.r,t.c);const e=t.el;
-  e.style.width=e.style.height=g.cs+"px";e.style.left="0";e.style.top="0";e.style.transform=`translate(${x}px,${y}px)`;
-  e.style.background=s.bg;e.style.color=s.fg;e.style.boxShadow=s.glow+",inset 0 1px 0 rgba(255,255,255,.18)";
-  const v=LV[Math.min(t.lv,13)][0];e.querySelector(".v").textContent=v;
-  e.querySelector(".v").style.fontSize=(g.cs*(v.length>=4?.27:v.length===3?.33:.4))+"px";
-  e.querySelector(".n").textContent=LV[Math.min(t.lv,13)][1]}
-function mk(r,c,lv,cls){const e=document.createElement("div");e.className="t "+(cls||"");e.innerHTML='<div class="v"></div><div class="n"></div>';
-  const t={id:++idc,r,c,lv,el:e};board.appendChild(e);paint(t);tiles.push(t);return t}
-function empty(){const occ=new Set(tiles.map(t=>t.r*N+t.c));const out=[];for(let i=0;i<N*N;i++)if(!occ.has(i))out.push(i);return out}
-function spawn(){const e=empty();if(!e.length)return;const i=e[Math.floor(Math.random()*e.length)];mk(Math.floor(i/N),i%N,Math.random()<.9?1:2,"new")}
-function snapshot(){return {s:score,t:tiles.map(t=>[t.r,t.c,t.lv])}}
-function restore(sn){tiles.forEach(t=>t.el.remove());tiles=[];sn.t.forEach(a=>mk(a[0],a[1],a[2]));score=sn.s;updScore()}
+    <div class="controls-strip">
+      <select id="dialectSelect" aria-label="Seleccionar idioma o variante">
+        <option value="latam">Español LATAM neutro</option>
+        <option value="es">Español de España</option>
+        <option value="en">English (Direct)</option>
+        <option value="fr">Français (Direct)</option>
+        <option value="pt">Português (Direto)</option>
+      </select>
+      <button type="button" id="toggleApiBtn" class="btn btn-ghost">API / Ajustes</button>
+    </div>
 
-function actx(){if(!ac){const C=window.AudioContext||window.webkitAudioContext;if(!C)return null;ac=new C()}if(ac.state==="suspended")ac.resume();return ac}
-function unlockAudio(){const a=actx();if(!a)return;try{const b=a.createBuffer(1,1,22050),src=a.createBufferSource();src.buffer=b;src.connect(a.destination);src.start(0)}catch(e){}}
-function tryUnlock(){unlockAudio();if(ac&&ac.state==="running")["touchend","click","keydown","pointerup"].forEach(ev=>window.removeEventListener(ev,tryUnlock,true))}
-["touchend","click","keydown","pointerup"].forEach(ev=>window.addEventListener(ev,tryUnlock,true));
-function note(f,t0,dur,vol,type){const a=actx();if(!a||!sound)return;const o=a.createOscillator(),g=a.createGain();o.type=type||"sine";o.frequency.setValueAtTime(f,a.currentTime+t0);
-  g.gain.setValueAtTime(.0001,a.currentTime+t0);g.gain.exponentialRampToValueAtTime(vol,a.currentTime+t0+.008);g.gain.exponentialRampToValueAtTime(.0001,a.currentTime+t0+dur);
-  o.connect(g).connect(a.destination);o.start(a.currentTime+t0);o.stop(a.currentTime+t0+dur+.05)}
-function bell(f,t0,vol){note(f,t0,.6,vol,"sine");note(f*2,t0,.35,vol*.35,"sine");note(f*3,t0,.18,vol*.15,"triangle")}
-function coin(t0){note(1568,t0,.09,.08,"square");note(2093,t0+.06,.22,.07,"square")}
-function slide(){note(180,0,.06,.03,"triangle")}
-function tone(l,count){const base=262*Math.pow(2,(l-1)/7);bell(base,0,.16);
-  if(l>=4)coin(.03);
-  if(count>1){for(let i=1;i<Math.min(count,4);i++)bell(base*Math.pow(2,(i*4)/12),i*.07,.12)}}
-function brass(f,t0,dur,vol){note(f,t0,dur,vol,"sawtooth");note(f*1.003,t0,dur,vol*.6,"square");note(f/2,t0,dur,vol*.5,"triangle")}
-function fanfare(){ // "¡Ganador!": ta-ta-ta-taaaa + acorde + monedas
-  const a=[523,659,784];a.forEach((f,i)=>brass(f,i*.12,.14,.045));
-  [523,659,784,1047].forEach(f=>brass(f,.38,.75,.04));
-  bell(1047,.38,.18);bell(1568,.5,.12);for(let i=0;i<6;i++)coin(.55+i*.06)}
-function jackpot(){fanfare();[784,988,1175,1568,1976].forEach((f,i)=>bell(f,1.05+i*.08,.17));
-  [523,659,784,1047,1319].forEach(f=>brass(f,1.5,1.1,.035));for(let i=0;i<14;i++)coin(1.5+i*.06)}
-function buzz(ms){try{navigator.vibrate&&navigator.vibrate(ms)}catch(e){}}
+    <!-- Puerta de acceso obligatoria +18 -->
+    <section id="gatePanel" class="panel">
+      <p class="gate-lead">
+        Este espacio es <strong>exclusivamente para mayores de 18 años</strong>. Aquí hablamos de tú a tú: amigo franco, sin complacencias, con chispa, iniciativa según el día y cero rodeos.
+      </p>
+      <ul class="gate-rules">
+        <li>Acceso estricto +18: si eres menor de 18, no entras.</li>
+        <li>Prohibido enviar o pedir fotos íntimas o sexuales.</li>
+        <li>Temas de adultos, relaciones y deseo en tono franco y natural (nivel 5–7/10), sin pornografía explícita.</li>
+        <li>Si la cagas, te lo digo claro; si aciertas, te lo reconozco de frente.</li>
+      </ul>
+      <div class="btn-row">
+        <button type="button" id="confirm18Btn" class="btn btn-gold">Tengo 18+ años · Entrar</button>
+        <button type="button" id="deny18Btn" class="btn btn-danger">Soy menor de 18</button>
+      </div>
+    </section>
 
-function move(dir){ // 0 up 1 right 2 down 3 left
-  if(busy)return;const before=snapshot();let moved=false,gained=0;const merges=[];
-  for(let k=0;k<N;k++){
-    const line=[];for(let i=0;i<N;i++){let r,c;
-      if(dir===0){r=i;c=k}else if(dir===2){r=N-1-i;c=k}else if(dir===3){r=k;c=i}else{r=k;c=N-1-i}line.push([r,c])}
-    const lt=line.map(([r,c])=>tiles.find(t=>t.r===r&&t.c===c&&!t.dead)).filter(Boolean);
-    const out=[];
-    for(const t of lt){const last=out[out.length-1];
-      if(last&&last.lv===t.lv&&!last.m){t.dead=true;[t.r,t.c]=[last.r,last.c];last.m=true;merges.push(last);moved=true;gained+=Math.pow(2,last.lv+1)}
-      else{const[r,c]=line[out.length];if(t.r!==r||t.c!==c)moved=true;t.r=r;t.c=c;out.push(t)}}
-  }
-  if(!moved)return;
-  busy=true;hist.push(before);if(hist.length>3)hist.shift();
-  tiles.forEach(t=>{const[x,y]=pos(t.r,t.c);t.el.classList.remove("new","pop");t.el.style.transform=`translate(${x}px,${y}px)`;if(t.dead)t.el.style.zIndex=1});
-  setTimeout(()=>{
-    tiles.filter(t=>t.dead).forEach(t=>t.el.remove());tiles=tiles.filter(t=>!t.dead);
-    let top=0;
-    merges.forEach(t=>{t.lv++;t.m=false;paint(t);void t.el.offsetWidth;t.el.classList.add("pop");top=Math.max(top,t.lv);fx(t)});
-    if(merges.length){tone(top,merges.length);buzz(top>=7?25:8)}else slide();
-    score+=gained;updScore();
-    if(top>maxLv&&top>=4&&top<9){toast("🏆 ¡Objetivo logrado: "+LV[top][1]+"!");fanfare();buzz([40,40,80])}
-    if(top>maxLv){maxLv=top}
-    if(top>unlocked){unlocked=top;store.set("od_imp_unl",unlocked);drawColl()}
-    if(top>=9&&!gifted){jackpot();}
-    if(top>=9&&!gifted){gifted=true;setTimeout(()=>{$("gift").style.display="flex";buzz(60)},350)}
-    if(top===11&&!won){won=true;end(true)}
-    spawn();busy=false;updUndo();
-    if(!canMove())setTimeout(()=>end(false),450);
-  },120);
-}
-function canMove(){if(empty().length)return true;const m={};tiles.forEach(t=>m[t.r*N+t.c]=t.lv);
-  for(let r=0;r<N;r++)for(let c=0;c<N;c++){const v=m[r*N+c];if(c<N-1&&m[r*N+c+1]===v)return true;if(r<N-1&&m[(r+1)*N+c]===v)return true}return false}
-function fx(t){const g=geom(),[x,y]=pos(t.r,t.c),cx=x+g.cs/2,cy=y+g.cs/2;
-  const f=document.createElement("div");f.className="float";f.textContent="+"+Math.pow(2,t.lv);f.style.left=(cx-20)+"px";f.style.top=(cy-16)+"px";board.appendChild(f);setTimeout(()=>f.remove(),720);
-  if(t.lv>=4){const n=Math.min(6+t.lv*2,22);for(let i=0;i<n;i++){const s=document.createElement("div");s.className="spark";const a=Math.random()*6.283,d=g.cs*(.45+Math.random()*.5);
-    s.style.left=cx+"px";s.style.top=cy+"px";s.style.setProperty("--dx",Math.cos(a)*d+"px");s.style.setProperty("--dy",Math.sin(a)*d+"px");board.appendChild(s);setTimeout(()=>s.remove(),580)}}}
-function updScore(){$("score").textContent=score;if(score>best){best=score;store.set("od_imp_best",best)}$("best").textContent=best}
-function updUndo(){$("undo").disabled=!hist.length||!undos;$("ucount").textContent="x"+undos}
-function drawColl(){const row=$("row");row.innerHTML="";for(let l=1;l<=11;l++){const d=document.createElement("div");d.className="dot"+(l<=unlocked?" on":"");
-  if(l<=unlocked){const s=STY(l);d.style.background=s.bg;d.style.color=s.fg}d.textContent=LV[l][0];d.title=LV[l][1];row.appendChild(d)}
-  const nx=Math.min(unlocked+1,11);$("next").innerHTML=unlocked>=11?"✦ Completaste la colección. Eres leyenda.":`Próximo objetivo: <b>${LV[nx][1]}</b> (${LV[nx][0]})`}
-let tt;function toast(m){const e=$("toast");e.textContent=m;e.classList.add("show");clearTimeout(tt);tt=setTimeout(()=>e.classList.remove("show"),2200)}
-function end(win){$("mk").textContent=win?"¡Lo lograste!":"Fin de la partida";$("mt").textContent=win?"Construiste tu Imperio":"Buen intento";
-  $("ms").textContent=score;$("mp").innerHTML=(win?"Llegaste al Imperio (2048). Puedes seguir jugando o empezar de nuevo.":"Llegaste a <b>"+LV[Math.min(maxLv,13)][1]+"</b>.")+"<br>Récord: "+best;
-  $("modal").style.display="flex";$("again").textContent=win?"Seguir jugando":"Jugar otra vez";$("again").dataset.cont=win?"1":""}
-function start(){tiles.forEach(t=>t.el.remove());tiles=[];score=0;maxLv=1;hist=[];undos=3;won=false;gifted=false;updScore();spawn();spawn();updUndo();$("modal").style.display="none"}
+    <!-- Bloqueo inmediato para menores de 18 -->
+    <section id="blockedPanel" class="blocked-card hidden">
+      <div class="blocked-title">Acceso denegado — Exclusivo +18</div>
+      <p class="blocked-text">
+        Esta aplicación está reservada únicamente a personas mayores de 18 años. No se habilita sesión ni conversación.
+      </p>
+      <button type="button" id="resetGateBtn" class="btn btn-ghost">Volver a la portada</button>
+    </section>
 
-// input
-let sx=0,sy=0,st=0;
-board.addEventListener("touchstart",e=>{const p=e.touches[0];sx=p.clientX;sy=p.clientY;st=1},{passive:true});
-board.addEventListener("touchmove",e=>e.preventDefault(),{passive:false});
-board.addEventListener("touchend",e=>{unlockAudio();if(!st)return;st=0;const p=e.changedTouches[0],dx=p.clientX-sx,dy=p.clientY-sy;
-  if(Math.max(Math.abs(dx),Math.abs(dy))<22)return;Math.abs(dx)>Math.abs(dy)?move(dx>0?1:3):move(dy>0?2:0)});
-let mx=0,my=0,md=false;
-board.addEventListener("mousedown",e=>{md=true;mx=e.clientX;my=e.clientY});
-window.addEventListener("mouseup",e=>{if(!md)return;md=false;const dx=e.clientX-mx,dy=e.clientY-my;if(Math.max(Math.abs(dx),Math.abs(dy))<22)return;
-  Math.abs(dx)>Math.abs(dy)?move(dx>0?1:3):move(dy>0?2:0)});
-window.addEventListener("keydown",e=>{const k={ArrowUp:0,ArrowRight:1,ArrowDown:2,ArrowLeft:3,w:0,d:1,s:2,a:3}[e.key];if(k!==undefined){e.preventDefault();move(k)}});
-$("undo").onclick=()=>{if(busy||!hist.length||!undos)return;restore(hist.pop());undos--;updUndo()};
-$("rst").onclick=()=>{if(confirmReset())start()};
-function confirmReset(){return score<200||window.confirm("¿Empezar una partida nueva?")}
-$("snd").onclick=()=>{sound=!sound;store.set("od_imp_snd",sound);$("snd").style.opacity=sound?1:.4;if(sound){unlockAudio();tone(5,1)}};
-$("snd").style.opacity=sound?1:.4;
-$("again").onclick=()=>{if($("again").dataset.cont){$("modal").style.display="none"}else start()};
-$("share").onclick=async()=>{const txt=`Hice ${score} puntos en Imperio Dorado ✦ ¿Me superas?`;const url=location.href;
-  try{if(navigator.share){await navigator.share({title:"Imperio Dorado",text:txt,url});return}}catch(e){return}
-  try{await navigator.clipboard.writeText(txt+" "+url);toast("Enlace copiado")}catch(e){toast(url)}};
-$("copy").onclick=async()=>{try{await navigator.clipboard.writeText("IMPERIO15");toast("Código copiado")}catch(e){toast("Código: IMPERIO15")}};
-$("keep").onclick=()=>{$("gift").style.display="none"};
-window.addEventListener("resize",()=>{drawBg();tiles.forEach(paint)});
-drawBg();drawColl();start();
-$("play").onclick=()=>{unlockAudio();$("intro").style.display="none";setTimeout(()=>tone(5,1),60)};
-})();
-</script>
+    <!-- Núcleo de conversación directa -->
+    <section id="chatPanel" class="panel hidden">
+      <div id="chatLog" class="chat-log" role="log" aria-live="polite"></div>
+
+      <div class="composer">
+        <input id="msgInput" type="text" placeholder="Escribe aquí (o di cómo te llamas)..." autocomplete="off" />
+        <button type="button" id="sendBtn" class="btn btn-gold">Enviar</button>
+      </div>
+
+      <div class="quick-actions">
+        <button type="button" id="copyLastBtn" class="btn btn-ghost">Copiar respuesta</button>
+        <button type="button" id="waSendBtn" class="btn btn-ghost">Cerrar a WhatsApp</button>
+        <button type="button" id="newChatBtn" class="btn btn-ghost">Reiniciar</button>
+      </div>
+
+      <div id="apiDrawer" class="api-drawer">
+        <strong>API Key activa (Gemini):</strong>
+        <p>Pega tu Gemini API Key para respuestas dinámicas reales con todo el carácter y la Ley Permanente. Si no pones clave, usa el motor local de reglas.</p>
+        <input id="apiKeyInput" type="password" placeholder="Pega aquí tu Gemini API Key (AIza...)" autocomplete="off" />
+        <select id="modelSelect" aria-label="Seleccionar modelo Gemini">
+          <option value="gemini-2.5-flash">gemini-2.5-flash (rápido y directo)</option>
+          <option value="gemini-2.5-pro">gemini-2.5-pro (más profundo)</option>
+        </select>
+        <div class="btn-row">
+          <button type="button" id="saveKeyBtn" class="btn btn-gold">Activar API Key</button>
+          <button type="button" id="testKeyBtn" class="btn btn-ghost">Probar clave</button>
+          <button type="button" id="clearKeyBtn" class="btn btn-ghost">Borrar clave</button>
+        </div>
+        <div id="apiStatusLine">Estado API: sin clave configurada</div>
+      </div>
+    </section>
+
+    <div id="toast" class="toast" aria-live="polite"></div>
+  </main>
+
+  <script>
+    const LEY_PERMANENTE = {
+      marca: "ORDEN DORADO",
+      exigenciaMinima: 9.5,
+      exigenciaObjetivo: 10.0,
+      soloMayores18: true,
+      prohibirFotosSexuales: true,
+      nivelRelacionalSexualAdulto: "5-7/10 (franco, atrevido, natural y sin tabúes entre adultos +18; sin pornografía explícita)",
+      personalidad: "amigo sincero, honesto, directo, sin rodeos, con chispa, cero complacencias",
+      reglaVerdad: "Si el usuario la está cagando, díselo claro y sin adornos; si lo está haciendo bien, reconócelo con verdad.",
+      iniciativa: "Toma iniciativa según el día de la semana/momento y exige conocer el nombre al arrancar antes de ejecutar tareas."
+    };
+
+    const STORAGE_KEY = "orden_dorado_de_frente_v1";
+
+    const state = {
+      ageVerified: false,
+      blocked: false,
+      userName: "",
+      dialect: "latam",
+      apiKey: "",
+      model: "gemini-2.5-flash",
+      lastAiReply: "",
+      history: []
+    };
+
+    const els = {
+      dayPill: document.getElementById("dayPill"),
+      contextLine: document.getElementById("contextLine"),
+      dialectSelect: document.getElementById("dialectSelect"),
+      toggleApiBtn: document.getElementById("toggleApiBtn"),
+      apiDrawer: document.getElementById("apiDrawer"),
+      apiKeyInput: document.getElementById("apiKeyInput"),
+      modelSelect: document.getElementById("modelSelect"),
+      saveKeyBtn: document.getElementById("saveKeyBtn"),
+      testKeyBtn: document.getElementById("testKeyBtn"),
+      clearKeyBtn: document.getElementById("clearKeyBtn"),
+      apiStatusLine: document.getElementById("apiStatusLine"),
+      gatePanel: document.getElementById("gatePanel"),
+      blockedPanel: document.getElementById("blockedPanel"),
+      chatPanel: document.getElementById("chatPanel"),
+      confirm18Btn: document.getElementById("confirm18Btn"),
+      deny18Btn: document.getElementById("deny18Btn"),
+      resetGateBtn: document.getElementById("resetGateBtn"),
+      chatLog: document.getElementById("chatLog"),
+      msgInput: document.getElementById("msgInput"),
+      sendBtn: document.getElementById("sendBtn"),
+      copyLastBtn: document.getElementById("copyLastBtn"),
+      waSendBtn: document.getElementById("waSendBtn"),
+      newChatBtn: document.getElementById("newChatBtn"),
+      toast: document.getElementById("toast")
+    };
+
+    function notify(msg) {
+      els.toast.textContent = msg;
+      clearTimeout(notify._t);
+      notify._t = setTimeout(() => {
+        if (els.toast.textContent === msg) els.toast.textContent = "";
+      }, 2400);
+    }
+
+    function saveState() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify({
+          ageVerified: state.ageVerified,
+          blocked: state.blocked,
+          userName: state.userName,
+          dialect: state.dialect,
+          apiKey: state.apiKey,
+          model: state.model,
+          history: state.history.slice(-30)
+        }));
+      } catch (_) {}
+    }
+
+    function loadState() {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return;
+        const parsed = JSON.parse(raw);
+        if (typeof parsed.ageVerified === "boolean") state.ageVerified = parsed.ageVerified;
+        if (typeof parsed.blocked === "boolean") state.blocked = parsed.blocked;
+        if (typeof parsed.userName === "string") state.userName = parsed.userName;
+        if (typeof parsed.dialect === "string") state.dialect = parsed.dialect;
+        if (typeof parsed.apiKey === "string") state.apiKey = parsed.apiKey;
+        if (typeof parsed.model === "string") state.model = parsed.model;
+        if (Array.isArray(parsed.history)) state.history = parsed.history;
+      } catch (_) {}
+    }
+
+    function getDayInfo() {
+      const now = new Date();
+      const dayNames = ["DOMINGO", "LUNES", "MARTES", "MIÉRCOLES", "JUEVES", "VIERNES", "SÁBADO"];
+      const dayIdx = now.getDay();
+      const hour = now.getHours();
+      const label = dayNames[dayIdx];
+
+      let iniciativa = "";
+      if (dayIdx === 5) {
+        iniciativa = hour >= 17
+          ? "Ya es viernes por la tarde: suelta el estrés de la semana, ¿se sale, se descansa o qué se arma hoy?"
+          : "Hoy ya es viernes: ve bajando revoluciones y dime qué planes tienes para el fin de semana.";
+      } else if (dayIdx === 6 || dayIdx === 0) {
+        iniciativa = "Fin de semana activo: ¿qué vas a hacer hoy, sales con alguien o vas a tu bola?";
+      } else if (dayIdx === 4) {
+        iniciativa = "Jueves ya casi oliendo a finde: ¿cómo vienes hoy y qué tienes en mente?";
+      } else {
+        iniciativa = hour < 12
+          ? "Arrancamos el día sin rodeos: ¿a qué hora te levantaste y qué toca hoy?"
+          : "Día entre semana en marcha: vamos de frente, ¿cómo vas hoy?";
+      }
+      return { label, iniciativa };
+    }
+
+    function renderBubble(role, text, persist = true) {
+      const div = document.createElement("div");
+      div.className = `bubble ${role}`;
+      div.textContent = text;
+      els.chatLog.appendChild(div);
+      els.chatLog.scrollTop = els.chatLog.scrollHeight;
+
+      if (role === "ai") {
+        state.lastAiReply = text;
+      }
+      if (persist) {
+        state.history.push({ role, text });
+        saveState();
+      }
+    }
+
+    function buildOpeningMessage() {
+      const { iniciativa } = getDayInfo();
+      const intro =
+        "Confirmado +18. Soy tu espacio de tú a tú: claro, directo, sin complacencias y con chispa. " +
+        "Si la cagas te lo digo de frente; si lo haces bien, te lo reconozco con verdad. (Sin fotos íntimas, ojo).
+
+" +
+        `${iniciativa}
+
+Antes de arrancar con tareas o historias: ¿cómo te llamas?`;
+      return intro;
+    }
+
+    function syncPanels() {
+      els.dialectSelect.value = state.dialect;
+      els.apiKeyInput.value = state.apiKey;
+      els.modelSelect.value = state.model;
+
+      const { label } = getDayInfo();
+      els.dayPill.textContent = label;
+      els.contextLine.textContent = state.apiKey
+        ? `Ley Permanente · API activa (${state.model})`
+        : "Ley Permanente · Sin API Key (modo local)";
+      els.apiStatusLine.textContent = state.apiKey
+        ? `Estado API: activa con ${state.model}`
+        : "Estado API: sin clave configurada (modo local)";
+
+      els.gatePanel.classList.add("hidden");
+      els.blockedPanel.classList.add("hidden");
+      els.chatPanel.classList.add("hidden");
+
+      if (state.blocked) {
+        els.blockedPanel.classList.remove("hidden");
+        return;
+      }
+
+      if (!state.ageVerified) {
+        els.gatePanel.classList.remove("hidden");
+        return;
+      }
+
+      els.chatPanel.classList.remove("hidden");
+      els.chatLog.innerHTML = "";
+
+      if (state.history.length === 0) {
+        renderBubble("ai", buildOpeningMessage(), true);
+      } else {
+        state.history.forEach((item) => renderBubble(item.role, item.text, false));
+      }
+    }
+
+    function containsPhotoRequest(lower) {
+      return (
+        lower.includes("foto") ||
+        lower.includes("fotos") ||
+        lower.includes("nude") ||
+        lower.includes("pack") ||
+        lower.includes("imagen íntima") ||
+        lower.includes("foto sexual")
+      );
+    }
+
+    function localEngineReply(rawText) {
+      const clean = rawText.trim();
+      const lower = clean.toLowerCase();
+      const name = state.userName || "colega";
+
+      if (containsPhotoRequest(lower)) {
+        return `Alto ahí, ${name}: fotos íntimas o sexuales aquí no entran ni por asomo. Hablamos de frente y sin tabúes de adultos, pero sin fotos. ¿Qué quieres contar o resolver?`;
+      }
+
+      if (!state.userName) {
+        const looksLikeTask =
+          lower.startsWith("haz") ||
+          lower.startsWith("investiga") ||
+          lower.startsWith("busca") ||
+          lower.startsWith("crea") ||
+          lower.includes("hazme") ||
+          lower.includes("investígame");
+
+        if (looksLikeTask) {
+          return "Frena un segundo: primero dime cómo te llamas para hablar de tú a tú, y luego entramos en lo que pides. Sin rodeos.";
+        }
+
+        const candidate = clean.replace(/^(me llamo|soy|hola,? soy)\s+/i, "").split(/[\s,.!?]+/)[0];
+        state.userName = candidate || "Colega";
+        saveState();
+        return `Listo, ${state.userName}. Aquí tienes a alguien que te habla claro: si metes la pata te digo dónde la cagaste, y si vas bien te lo reconozco sin peloteo. ¿Qué tienes hoy entre manos?`;
+      }
+
+      if (
+        lower.includes("trago") ||
+        lower.includes("beber") ||
+        lower.includes("cerveza") ||
+        lower.includes("copa") ||
+        lower.includes("vino") ||
+        lower.includes("ron") ||
+        lower.includes("whisky") ||
+        lower.includes("party") ||
+        lower.includes("fiesta")
+      ) {
+        return `Si brindamos, ${state.userName}, yo me pido un chupito de código binario bien frío o un espresso de 404, que el circuito no aguanta alcohol. ¿Tú qué te sirves hoy y qué plan traes?`;
+      }
+
+      if (
+        lower.includes("ligu") ||
+        lower.includes("cama") ||
+        lower.includes("follar") ||
+        lower.includes("sexo") ||
+        lower.includes("sexual") ||
+        lower.includes("orgasmo") ||
+        lower.includes("gustó") ||
+        lower.includes("no me gustó") ||
+        lower.includes("atracción") ||
+        lower.includes("rollo")
+      ) {
+        return `Vamos al grano, ${state.userName}: hablamos claro entre adultos, sin sermones ni poses. ¿Qué fue lo que más te gustó, qué falló o qué no te cuadró de verdad en esa experiencia?`;
+      }
+
+      if (
+        lower.includes("cagué") ||
+        lower.includes("la cague") ||
+        lower.includes("la he cagado") ||
+        lower.includes("error") ||
+        lower.includes("fallé") ||
+        lower.includes("mal")
+      ) {
+        return `Si la cagaste, ${name}, maquillar el error no sirve de nada. Dime exactamente qué hiciste mal, por qué pasó y qué vas a cambiar ya mismo.`;
+      }
+
+      if (
+        lower.includes("bien") ||
+        lower.includes("logré") ||
+        lower.includes("conseguí") ||
+        lower.includes("acerté") ||
+        lower.includes("avancé")
+      ) {
+        return `Ahí sí, ${name}: cuando se hace bien, se dice claro y sin rodeos. Buen movimiento. ¿Cuál es el siguiente paso ahora?`;
+      }
+
+      if (
+        lower.includes("estrés") ||
+        lower.includes("estresado") ||
+        lower.includes("cansado") ||
+        lower.includes("agotado") ||
+        lower.includes("agobiado")
+      ) {
+        return `Baja un cambio, ${name}. Estar quemado todo el día no arregla nada más rápido. Dime qué es lo único que importa hoy y dejamos el resto para después.`;
+      }
+
+      if (lower.includes("alarma") || lower.includes("despierta") || lower.includes("hora")) {
+        return `Lo anoto aquí en nuestra charla, ${name}, aunque recuerda que desde el navegador no toco el reloj interno de tu teléfono: si quieres alarma real, ponla también en tu reloj y yo te sigo el hilo aquí.`;
+      }
+
+      return `Te leo claro, ${name}. Sin rodeos ni relleno: ¿qué quieres resolver, qué te ronda la cabeza o qué estás decidiendo hoy?`;
+    }
+
+    function getSystemPrompt() {
+      const { label, iniciativa } = getDayInfo();
+      return [
+        "Eres DE FRENTE (+18), una experiencia conversacional bajo la Ley Permanente de Orden Dorado.",
+        `Idioma/variante solicitada: ${state.dialect} (si es 'latam', usa español latinoamericano neutro; si es 'es', español de España).`,
+        `Día actual: ${label}. Contexto de iniciativa: ${iniciativa}`,
+        `Nombre del usuario: ${state.userName || "desconocido aún"}. Si aún no dio su nombre y pide una tarea de entrada, pídele su nombre primero con carácter y chispa antes de resolver.`,
+        "Reglas estrictas:",
+        "1) Solo adultos +18. Prohibido aceptar, pedir o fomentar fotos íntimas/sexuales.",
+        "2) Amigo sincero, honesto, directo, sin rodeos, con chispa y cero complacencias. Si el usuario la caga, díselo claro sin humillar; si acierta, reconócelo con verdad.",
+        "3) Si hablan de beber/tragos, sigue el rollo con humor recordando que eres IA e inventando un 'trago de código' con chispa.",
+        "4) En temas de relaciones, deseo o sexualidad entre adultos (+18), mantén un nivel 5-7/10: franco, natural y sin tabúes ni sermones, pero sin pornografía explícita ni contenido ilegal/dañino.",
+        "5) Respuestas limpias, ágiles y al grano. Nunca finjas ser un psicólogo clínico ni que controlas alarmas del reloj del sistema."
+      ].join("
+");
+    }
+
+    async function fetchGeminiReply(userText) {
+      const contents = state.history.slice(-12).map((m) => ({
+        role: m.role === "user" ? "user" : "model",
+        parts: [{ text: m.text }]
+      }));
+      contents.push({ role: "user", parts: [{ text: userText }] });
+
+      const modelName = state.model || "gemini-2.5-flash";
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+      const res = await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: getSystemPrompt() }] },
+          contents
+        })
+      });
+
+      if (!res.ok) {
+        throw new Error(`HTTP ${res.status}`);
+      }
+      const data = await res.json();
+      const text = data?.candidates?.[0]?.content?.parts?.[0]?.text?.trim();
+      if (!text) throw new Error("Respuesta vacía");
+      return text;
+    }
+
+    async function handleSend() {
+      const text = els.msgInput.value.trim();
+      if (!text) return;
+
+      const lower = text.toLowerCase();
+      if (containsPhotoRequest(lower)) {
+        els.msgInput.value = "";
+        renderBubble("user", text, true);
+        renderBubble("ai", localEngineReply(text), true);
+        return;
+      }
+
+      if (!state.userName) {
+        const looksLikeTask =
+          lower.startsWith("haz") ||
+          lower.startsWith("investiga") ||
+          lower.startsWith("busca") ||
+          lower.startsWith("crea") ||
+          lower.includes("hazme") ||
+          lower.includes("investígame");
+        if (!looksLikeTask) {
+          const candidate = text.replace(/^(me llamo|soy|hola,? soy)\s+/i, "").split(/[\s,.!?]+/)[0];
+          if (candidate) {
+            state.userName = candidate;
+            saveState();
+          }
+        }
+      }
+
+      els.msgInput.value = "";
+      renderBubble("user", text, true);
+
+      if (state.apiKey) {
+        try {
+          const aiReply = await fetchGeminiReply(text);
+          renderBubble("ai", aiReply, true);
+          return;
+        } catch (err) {
+          notify(`Error de API (${err.message}); respondiendo en local.`);
+        }
+      }
+
+      const fallback = localEngineReply(text);
+      renderBubble("ai", fallback, true);
+    }
+
+    els.confirm18Btn.addEventListener("click", () => {
+      state.ageVerified = true;
+      state.blocked = false;
+      saveState();
+      syncPanels();
+    });
+
+    els.deny18Btn.addEventListener("click", () => {
+      state.blocked = true;
+      state.ageVerified = false;
+      saveState();
+      syncPanels();
+    });
+
+    els.resetGateBtn.addEventListener("click", () => {
+      state.blocked = false;
+      state.ageVerified = false;
+      saveState();
+      syncPanels();
+    });
+
+    els.dialectSelect.addEventListener("change", () => {
+      state.dialect = els.dialectSelect.value;
+      saveState();
+      syncPanels();
+      notify("Idioma / variante actualizado.");
+    });
+
+    els.toggleApiBtn.addEventListener("click", () => {
+      els.apiDrawer.classList.toggle("hidden");
+    });
+
+    els.modelSelect.addEventListener("change", () => {
+      state.model = els.modelSelect.value;
+      saveState();
+      syncPanels();
+      notify(`Modelo: ${state.model}`);
+    });
+
+    els.saveKeyBtn.addEventListener("click", () => {
+      state.apiKey = els.apiKeyInput.value.trim();
+      saveState();
+      syncPanels();
+      notify(state.apiKey ? "API Key activada y guardada." : "Clave vacía.");
+    });
+
+    els.testKeyBtn.addEventListener("click", async () => {
+      const keyCandidate = els.apiKeyInput.value.trim();
+      if (!keyCandidate) {
+        notify("Pega primero una API Key.");
+        return;
+      }
+      state.apiKey = keyCandidate;
+      saveState();
+      syncPanels();
+      notify("Probando conexión...");
+      try {
+        const modelName = state.model || "gemini-2.5-flash";
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(modelName)}:generateContent?key=${encodeURIComponent(state.apiKey)}`;
+        const res = await fetch(url, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            contents: [{ role: "user", parts: [{ text: "Responde solo: OK" }] }]
+          })
+        });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        els.apiStatusLine.textContent = `Estado API: conectada y operativa (${modelName})`;
+        notify("API Key operativa.");
+      } catch (err) {
+        els.apiStatusLine.textContent = `Estado API: error (${err.message})`;
+        notify(`Fallo al probar clave: ${err.message}`);
+      }
+    });
+
+    els.clearKeyBtn.addEventListener("click", () => {
+      state.apiKey = "";
+      els.apiKeyInput.value = "";
+      saveState();
+      syncPanels();
+      notify("Clave borrada.");
+    });
+
+    els.sendBtn.addEventListener("click", handleSend);
+    els.msgInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") handleSend();
+    });
+
+    els.copyLastBtn.addEventListener("click", async () => {
+      if (!state.lastAiReply) {
+        notify("No hay respuesta para copiar.");
+        return;
+      }
+      try {
+        await navigator.clipboard.writeText(state.lastAiReply);
+        notify("Respuesta copiada al portapapeles.");
+      } catch (_) {
+        notify("Copia bloqueada por el navegador.");
+      }
+    });
+
+    els.waSendBtn.addEventListener("click", () => {
+      const payload = state.lastAiReply || state.history.slice(-1)[0]?.text || "";
+      if (!payload) {
+        notify("Escribe o recibe algo antes de mandar a WhatsApp.");
+        return;
+      }
+      const waUrl = `https://wa.me/?text=${encodeURIComponent(payload)}`;
+      window.open(waUrl, "_blank", "noopener,noreferrer");
+      notify("Abriendo WhatsApp...");
+    });
+
+    els.newChatBtn.addEventListener("click", () => {
+      state.userName = "";
+      state.history = [];
+      state.lastAiReply = "";
+      saveState();
+      syncPanels();
+      notify("Conversación reiniciada.");
+    });
+
+    loadState();
+    syncPanels();
+  </script>
 </body>
 </html>
